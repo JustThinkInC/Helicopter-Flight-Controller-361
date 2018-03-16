@@ -1,0 +1,18 @@
+.jxbrowser-data
+.metadata
+RemoteSystemsTempFiles
+# in the lab file
+# folders
+.launches
+.settings
+Debug
+targetConfigs
+# Files
+.ccsproject
+.cproject
+.project
+*.cmd
+# rule our files are not alowd the sufix _ccs.c
+*_ccs.c
+	
+
