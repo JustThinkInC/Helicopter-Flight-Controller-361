@@ -1,13 +1,9 @@
-//*****************************************************************************
+// Milestone1.c - Measure helicopter height by sampling AIN9
 //
-// ADCdemo1.c - Simple interrupt driven program which samples with AIN0
+// Authors:  George Khella, Liam Laing, Connor Adamson
+// Original Author: P. J. Bones
 //
-// Author:  P.J. Bones	UCECE
-// Last modified:	8.2.2018
-//
-//*****************************************************************************
-// Based on the 'convert' series from 2016
-//*****************************************************************************
+
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -37,20 +33,22 @@
 static circBuf_t g_inBuffer;		// Buffer of size BUF_SIZE integers (sample values)
 static uint32_t g_ulSampCnt;	// Counter for the interrupts
 
-//*****************************************************************************
-//
-// The interrupt handler for the for SysTick interrupt.
-//
-//*****************************************************************************
+								//*****************************************************************************
+								//
+								// The interrupt handler for the for SysTick interrupt.
+								//
+								//*****************************************************************************
 void
 SysTickIntHandler(void)
 {
-    //
-    // Initiate a conversion
-    //
-    ADCProcessorTrigger(ADC0_BASE, 3); 
-    g_ulSampCnt++;
-    updateButtons();
+	//
+	// Initiate a conversion
+	//
+	ADCProcessorTrigger(ADC0_BASE, 3);
+	g_ulSampCnt++;
+
+	// Button polling
+	updateButtons();
 }
 
 //*****************************************************************************
@@ -63,83 +61,83 @@ void
 ADCIntHandler(void)
 {
 	uint32_t ulValue;
-	
+
 	//
 	// Get the single sample from ADC0.  ADC_BASE is defined in
 	// inc/hw_memmap.h
 	ADCSequenceDataGet(ADC0_BASE, 3, &ulValue);
 	//
 	// Place it in the circular buffer (advancing write index)
-	writeCircBuf (&g_inBuffer, ulValue);
+	writeCircBuf(&g_inBuffer, ulValue);
 	//
 	// Clean up, clearing the interrupt
-	ADCIntClear(ADC0_BASE, 3);                          
+	ADCIntClear(ADC0_BASE, 3);
 }
 
 //*****************************************************************************
 // Initialisation functions for the clock (incl. SysTick), ADC, display
 //*****************************************************************************
 void
-initClock (void)
+initClock(void)
 {
-    // Set the clock rate to 20 MHz
-    SysCtlClockSet (SYSCTL_SYSDIV_10 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN |
-                   SYSCTL_XTAL_16MHZ);
-    //
-    // Set up the period for the SysTick timer.  The SysTick timer period is
-    // set as a function of the system clock.
-    SysTickPeriodSet(SysCtlClockGet() / SAMPLE_RATE_HZ);
-    //
-    // Register the interrupt handler
-    SysTickIntRegister(SysTickIntHandler);
-    //
-    // Enable interrupt and device
-    SysTickIntEnable();
-    SysTickEnable();
-}
-
-void 
-initADC (void)
-{
-    //
-    // The ADC0 peripheral must be enabled for configuration and use.
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
-    
-    // Enable sample sequence 3 with a processor signal trigger.  Sequence 3
-    // will do a single sample when the processor sends a signal to start the
-    // conversion.
-    ADCSequenceConfigure(ADC0_BASE, 3, ADC_TRIGGER_PROCESSOR, 0);
-  
-    //
-    // Configure step 0 on sequence 3.  Sample channel 0 (ADC_CTL_CH0) in
-    // single-ended mode (default) and configure the interrupt flag
-    // (ADC_CTL_IE) to be set when the sample is done.  Tell the ADC logic
-    // that this is the last conversion on sequence 3 (ADC_CTL_END).  Sequence
-    // 3 has only one programmable step.  Sequence 1 and 2 have 4 steps, and
-    // sequence 0 has 8 programmable steps.  Since we are only doing a single
-    // conversion using sequence 3 we will only configure step 0.  For more
-    // on the ADC sequences and steps, refer to the LM3S1968 datasheet.
-    ADCSequenceStepConfigure(ADC0_BASE, 3, 0, ADC_CTL_CH9 | ADC_CTL_IE |
-                             ADC_CTL_END);    
-                             
-    //
-    // Since sample sequence 3 is now configured, it must be enabled.
-    ADCSequenceEnable(ADC0_BASE, 3);
-  
-    //
-    // Register the interrupt handler
-    ADCIntRegister (ADC0_BASE, 3, ADCIntHandler);
-  
-    //
-    // Enable interrupts for ADC0 sequence 3 (clears any outstanding interrupts)
-    ADCIntEnable(ADC0_BASE, 3);
+	// Set the clock rate to 20 MHz
+	SysCtlClockSet(SYSCTL_SYSDIV_10 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN |
+		SYSCTL_XTAL_16MHZ);
+	//
+	// Set up the period for the SysTick timer.  The SysTick timer period is
+	// set as a function of the system clock.
+	SysTickPeriodSet(SysCtlClockGet() / SAMPLE_RATE_HZ);
+	//
+	// Register the interrupt handler
+	SysTickIntRegister(SysTickIntHandler);
+	//
+	// Enable interrupt and device
+	SysTickIntEnable();
+	SysTickEnable();
 }
 
 void
-initDisplay (void)
+initADC(void)
 {
-    // intialise the Orbit OLED display
-    OLEDInitialise ();
+	//
+	// The ADC0 peripheral must be enabled for configuration and use.
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
+
+	// Enable sample sequence 3 with a processor signal trigger.  Sequence 3
+	// will do a single sample when the processor sends a signal to start the
+	// conversion.
+	ADCSequenceConfigure(ADC0_BASE, 3, ADC_TRIGGER_PROCESSOR, 0);
+
+	//
+	// Configure step 0 on sequence 3.  Sample channel 0 (ADC_CTL_CH0) in
+	// single-ended mode (default) and configure the interrupt flag
+	// (ADC_CTL_IE) to be set when the sample is done.  Tell the ADC logic
+	// that this is the last conversion on sequence 3 (ADC_CTL_END).  Sequence
+	// 3 has only one programmable step.  Sequence 1 and 2 have 4 steps, and
+	// sequence 0 has 8 programmable steps.  Since we are only doing a single
+	// conversion using sequence 3 we will only configure step 0.  For more
+	// on the ADC sequences and steps, refer to the LM3S1968 datasheet.
+	ADCSequenceStepConfigure(ADC0_BASE, 3, 0, ADC_CTL_CH9 | ADC_CTL_IE |
+		ADC_CTL_END);
+
+	//
+	// Since sample sequence 3 is now configured, it must be enabled.
+	ADCSequenceEnable(ADC0_BASE, 3);
+
+	//
+	// Register the interrupt handler
+	ADCIntRegister(ADC0_BASE, 3, ADCIntHandler);
+
+	//
+	// Enable interrupts for ADC0 sequence 3 (clears any outstanding interrupts)
+	ADCIntEnable(ADC0_BASE, 3);
+}
+
+void
+initDisplay(void)
+{
+	// Intialise the Orbit OLED display
+	OLEDInitialise();
 }
 
 //*****************************************************************************
@@ -151,88 +149,81 @@ void
 displayMeanVal(uint16_t meanVal, char* units, uint32_t count)
 {
 	char string[17];  // 16 characters across the display
-	char clear[17] = {" "};
-  //  OLEDStringDraw ("ADC demo 1", 0, 0);
-	OLEDStringDraw(clear, 0,1);
-    // Form a new string for the line.  The maximum width specified for the
-    //  number field ensures it is displayed right justified.
-    usnprintf (string, sizeof(string), "Alt = %d%s", meanVal, units);
-    // Update line on display.
-    OLEDStringDraw (string, 0, 1);
-
- //   usnprintf (string, sizeof(string), "Sample # %5d", count);
- //   OLEDStringDraw (string, 0, 3);
+	OLEDStringDraw("                ", 0, 1); // Clear the display
+											  // Form a new string for the line.
+	usnprintf(string, sizeof(string), "Alt = %d%s", meanVal, units);
+	// Update line on display.
+	OLEDStringDraw(string, 0, 1);
 }
 
 
 int
 main(void)
 {
+	//Counter in the for loop calculating mean of circular buffer values
 	uint16_t i;
 	int32_t sum;
-	
-	initClock ();
-	initButtons ();
-	initADC ();
-	initDisplay ();
-	initCircBuf (&g_inBuffer, BUF_SIZE);
 
-    //
-    // Enable interrupts to the processor.
-    IntMasterEnable();
-    uint16_t base_height = 0;
-    uint16_t mean_val;
-    uint8_t count = 0;
-    uint16_t percentage = 0;
+	initClock();
+	initButtons();
+	initADC();
+	initDisplay();
+	initCircBuf(&g_inBuffer, BUF_SIZE);
+
+	// Enable interrupts to the processor.
+	IntMasterEnable();
+
+	uint16_t baseHeight = 0;
+	uint16_t currentHeight;
+	uint8_t displayStage = 0;
+	uint16_t percentage = 0;
+
 	while (1)
 	{
-
-
-		//
 		// Background task: calculate the (approximate) mean of the values in the
 		// circular buffer and display it, together with the sample number.
 		sum = 0;
 		for (i = 0; i < BUF_SIZE; i++) {
-			sum = sum + readCircBuf (&g_inBuffer);
+			sum = sum + readCircBuf(&g_inBuffer);
 		}
+
 		// Calculate and display the rounded mean of the buffer contents
-		mean_val = (2 * sum + BUF_SIZE) / 2 / BUF_SIZE;
-		if (base_height == 0 || base_height == mean_val) {
-		    base_height = mean_val;
-		    percentage = 0;
-		    //displayMeanVal (0, "%", g_ulSampCnt);
-		} else {
-		    //Calculate helicopter altitude as a percentage
-		    percentage = ((2 * (base_height - mean_val) / 8) + 1) / 2;
-		    percentage = (mean_val > base_height) ? 0 : percentage;
-		   // displayMeanVal (percentage, g_ulSampCnt);
+		currentHeight = (2 * sum + BUF_SIZE) / 2 / BUF_SIZE;
+
+		if (baseHeight == 0) {
+			baseHeight = currentHeight;
+		}
+		else {
+			// Calculate helicopter altitude as a percentage
+			percentage = ((2 * (baseHeight - currentHeight) / 8) + 1) / 2;
+			percentage = (currentHeight > baseHeight) ? 0 : percentage;
+		}
+
+		// Reinitialise the base height
+		if (checkButton(LEFT) == PUSHED) {
+			baseHeight = currentHeight;
+			percentage = 0;
+		}
+		// Increment the display stage in range of 0 to 2
+		if (checkButton(UP) == PUSHED) {
+			displayStage = ++displayStage % 3;
 		}
 
 
-		if (checkButton (LEFT) == PUSHED) {
-		    base_height = mean_val;
-		 //   displayMeanVal(base_height, g_ulSampCnt);
+		// Update display based on current display stage
+		switch (displayStage) {
+		case 0:
+			displayMeanVal(percentage, "%", g_ulSampCnt); // Display altitude reading as percentage
+			break;
+		case 1:
+			displayMeanVal(currentHeight, " ", g_ulSampCnt); // Display the mean height reading
+			break;
+		case 2:
+			initDisplay(); // Reset and turn off the display
 		}
 
-		if (checkButton (UP) == PUSHED) {
-		    count = ++count % 3;
-//		    count++;
-//		    if(count > 2) {count = 0;}
-		}
 
-		switch (count) {
-		    case 0:
-		        displayMeanVal(percentage, "%", g_ulSampCnt);
-		        break;
-		    case 1:
-		        displayMeanVal(mean_val, " ", g_ulSampCnt);
-		        break;
-		    case 2:
-		        initDisplay();
-		    }
-
-
-		SysCtlDelay (SysCtlClockGet() / 12); // Update display at ~ 4 Hz
+		SysCtlDelay(SysCtlClockGet() / 15); // Update display at 10 Hz
 	}
 }
 
