@@ -182,6 +182,9 @@ main(void)
 		else {
 			// Calculate helicopter altitude as a rounded percentage
 			percentage = ((2 * (baseHeight - currentHeight) / 8) + 1) / 2;
+			// This avoids an overflow due to negative value in above calculation
+			// Negative value would occur if calibration was done at the non-landed altitude (e.g. half height), 
+			// hence any value below that would result in negative values
 			percentage = (currentHeight > baseHeight) ? 0 : percentage;
 		}
 
