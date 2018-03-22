@@ -1,7 +1,8 @@
 // Milestone1.c - Measure helicopter height by sampling AIN9
-//
+// Developed for ENCE360 2018 : University of Canterbury
 // Authors:  George Khella, Liam Laing, Connor Adamson
-// Original Author: P. J. Bones
+//
+// Based on ADCdemo1.c Authored by P. J. Bones
 //
 
 
@@ -21,11 +22,8 @@
 #include "OrbitOLED/OrbitOLEDInterface.h"
 #include "buttons4.h"
 
-//*****************************************************************************
-// Constants
-//*****************************************************************************
-#define BUF_SIZE 10
-#define SAMPLE_RATE_HZ 160
+#define BUF_SIZE 10 // Circ buffer used to store values pulled from ADC
+#define SAMPLE_RATE_HZ 160 // Number of times the data is pulled from the ADC
 
 //*****************************************************************************
 // Global variables
