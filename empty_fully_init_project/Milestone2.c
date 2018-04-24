@@ -102,14 +102,18 @@ yawIntHandler(void) {
     GPIODirModeSet(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_DIR_MODE_OUT);
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
 
-    if(GPIOPinRead(GPIO_PORTB_BASE, 0) > chA && GPIOPinRead(GPIO_PORTB_BASE, 1) == chB) {
+    if(GPIOPinRead(GPIO_PORTB_BASE, 0) == 1 && chA == 0) {
         yaw++;
-    } else if (GPIOPinRead(GPIO_PORTB_BASE, 0) > chA && GPIOPinRead(GPIO_PORTB_BASE, 1) > chB) {
-        yaw++;
-    } else if (GPIOPinRead(GPIO_PORTB_BASE, 0) < chA && GPIOPinRead(GPIO_PORTB_BASE, 1) < chB) {
+        chA++;
+    } else if (GPIOPinRead(GPIO_PORTB_BASE, 0) == 0 && chA == 1) {
         yaw--;
-    } else if (GPIOPinRead(GPIO_PORTB_BASE, 0) == chA && GPIOPinRead(GPIO_PORTB_BASE, 1) != chB) {
+        chA--;
+    } else if (GPIOPinRead(GPIO_PORTB_BASE, 1) == 1 && chB == 0) {
         yaw++;
+        chB++;
+    } else if (GPIOPinRead(GPIO_PORTB_BASE, 1) == 0 && chB == 1) {
+        yaw--;
+        chB--;
     }
 
     GPIOIntClear(GPIO_PORTB_BASE, 3);

@@ -28,7 +28,7 @@
 		<link>
 			<name>OrbitOLED</name>
 			<type>2</type>
-			<location>P:/lab_a02_group_10/OrbitOLED</location>
+			<location>C:/Users/G1010/Documents/ENCE361/labs/OrbitOLED</location>
 		</link>
 		<link>
 			<name>ustdlib.c</name>
