@@ -32,9 +32,9 @@
 //*****************************************************************************
 static circBuf_t g_inBuffer;    // Buffer of size BUF_SIZE integers (sample values)
 static uint32_t g_ulSampCnt;	// Counter for the interrupts
-static uint16_t yaw;
-static uint8_t chA = 0;
-static uint8_t chB = 0;
+static uint16_t yaw = 0;
+static uint8_t chA;
+static uint8_t chB;
 //*****************************************************************************
 //
 // The interrupt handler for the for SysTick interrupt.
@@ -106,14 +106,14 @@ yawIntHandler(void) {
         yaw++;
         chA++;
     } else if (GPIOPinRead(GPIO_PORTB_BASE, 0) == 0 && chA == 1) {
-        yaw--;
-        chA--;
+        yaw++;
+        chA++;
     } else if (GPIOPinRead(GPIO_PORTB_BASE, 1) == 1 && chB == 0) {
         yaw++;
         chB++;
     } else if (GPIOPinRead(GPIO_PORTB_BASE, 1) == 0 && chB == 1) {
-        yaw--;
-        chB--;
+        yaw++;
+        chB++;
     }
 
     GPIOIntClear(GPIO_PORTB_BASE, 3);
@@ -152,9 +152,15 @@ initYaw(void)
     // The GPIO PB0 peripheral must be enabled for configuration and use.
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
 
+    GPIOPadConfigSet(GPIO_PORTB_BASE, GPIO_PIN_0, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPU);
+    GPIOPadConfigSet(GPIO_PORTB_BASE, GPIO_PIN_1, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPU);
+
     //Configure GPIO
     GPIODirModeSet(GPIO_PORTB_BASE, 0, GPIO_DIR_MODE_IN);
     GPIODirModeSet(GPIO_PORTB_BASE, 1, GPIO_DIR_MODE_IN);
+
+    chA = GPIOPinRead(GPIO_PORTB_BASE, 0);
+    chB = GPIOPinRead(GPIO_PORTB_BASE, 1);
 
     // Register the interrupt handler
     GPIOIntRegister(GPIO_PORTB_BASE, yawIntHandler);
@@ -221,6 +227,8 @@ main(void)
 		// Calculate and display the rounded mean of the buffer contents
 		currentHeight = (2 * sum + BUF_SIZE) / 2 / BUF_SIZE;
 
+
+
 		if (baseHeight == 0) {
 			baseHeight = currentHeight;
 		}
@@ -243,10 +251,12 @@ main(void)
 			displayStage = ++displayStage % 3;
 		}
 
-		/*SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+
+
+		SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
 		GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPU);
 		GPIODirModeSet(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_DIR_MODE_IN);
-		if(!GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_4)){*/
+		//if(!GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_4)){
 		if(GPIOPinRead(GPIO_PORTB_BASE, 0) != chA || GPIOPinRead(GPIO_PORTB_BASE, 1) != chB) {
 		    yawIntHandler();
 		}
