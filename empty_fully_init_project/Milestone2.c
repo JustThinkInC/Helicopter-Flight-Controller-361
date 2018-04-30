@@ -32,7 +32,7 @@
 //*****************************************************************************
 static circBuf_t g_inBuffer;    // Buffer of size BUF_SIZE integers (sample values)
 static uint32_t g_ulSampCnt;    // Counter for the interrupts
-static int16_t yaw = 0;//uint16_t yaw = 0;
+static signed int yaw = 0;//uint16_t yaw = 0;
 static uint8_t PrevChAB = 0x00;
 //*****************************************************************************
 //
@@ -104,19 +104,39 @@ yawIntHandler(void) {
     uint16_t chAB = GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
     //displayMeanVal(chAB, "", 1);/*
     if (chAB != PrevChAB) {
-    if (PrevChAB == 0x00) {
-        yaw = (chAB == 0x01) ? yaw + 1 : yaw + 1;
-    } else if (PrevChAB == 0x01) {
-        yaw = (chAB == 0x02) ? yaw + 1 : yaw + 1;
-    } else if (PrevChAB == 0x02) {
-        yaw = (chAB == 0x03) ? yaw + 1 : yaw + 1;
-    } else if (PrevChAB == 0x03) {
-        yaw = (chAB == 0x03) ? yaw + 1 : yaw + 1;
+        if (PrevChAB == 0x00) {
+            //yaw = (chAB == 0x01) ? yaw + 1 : yaw - 1;
+            if (chAB == 0x01) {
+                yaw++;
+            } else if (chAB == 0x02) {
+                yaw--;
+            }
+        } else if (PrevChAB == 0x01) {
+            //yaw = (chAB == 0x02) ? yaw + 1 : yaw - 1;
+            if (chAB == 0x02) {
+                yaw++;
+            } else if (chAB == 0x00) {
+                yaw--;
+            }
+        } else if (PrevChAB == 0x02) {
+           // yaw = (chAB == 0x03) ? yaw + 1 : yaw - 1;
+            if (chAB == 0x03) {
+                yaw++;
+            } else if (chAB == 0x01) {
+                yaw--;
+            }
+        } else if (PrevChAB == 0x03) {
+           // yaw = (chAB == 0x00) ? yaw + 1 : yaw - 1;
+            if (chAB == 0x00) {
+                yaw++;
+            } else if (chAB == 0x02) {
+                yaw--;
+            }
+        }
+        PrevChAB = chAB;
     }
-    PrevChAB = chAB;}
-    GPIOIntClear(GPIO_PORTB_BASE, GPIO_PIN_0);
-    GPIOIntClear(GPIO_PORTB_BASE, GPIO_PIN_1);
-
+    GPIOIntClear(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+   // GPIOIntClear(GPIO_PORTB_BASE, GPIO_PIN_1);
 
 }
 
@@ -157,8 +177,8 @@ initYaw(void)
     GPIOPadConfigSet(GPIO_PORTB_BASE, GPIO_PIN_1, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPU);
 
     //Configure GPIO
-    GPIODirModeSet(GPIO_PORTB_BASE, 0, GPIO_DIR_MODE_IN);
-    GPIODirModeSet(GPIO_PORTB_BASE, 1, GPIO_DIR_MODE_IN);
+    GPIODirModeSet(GPIO_PORTB_BASE, GPIO_PIN_0, GPIO_DIR_MODE_IN);
+    GPIODirModeSet(GPIO_PORTB_BASE, GPIO_PIN_1, GPIO_DIR_MODE_IN);
 
   //  chA = GPIOPinRead(GPIO_PORTB_BASE, 0);
   //  chB = GPIOPinRead(GPIO_PORTB_BASE, 1);
@@ -169,8 +189,8 @@ initYaw(void)
     GPIOIntRegister(GPIO_PORTB_BASE, yawIntHandler);
 
     // Enable interrupts for GPIO Port B sequence 3 (clears any outstanding interrupts)
-    GPIOIntEnable(GPIO_PORTB_BASE, GPIO_PIN_0);
-    GPIOIntEnable(GPIO_PORTB_BASE, GPIO_PIN_1);
+    GPIOIntEnable(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+   // GPIOIntEnable(GPIO_PORTB_BASE, GPIO_PIN_1);
 }
 
 void
@@ -186,7 +206,7 @@ initDisplay(void)
 //
 //*****************************************************************************
 void
-displayMeanVal(uint16_t meanVal, char* units, uint32_t count)
+displayMeanVal(signed int meanVal, char* units, uint32_t count)
 {
     char string[17];  // 16 characters across the display
     OLEDStringDraw("                ", 0, 1); // Clear the display
@@ -226,7 +246,7 @@ main(void)
    //  yawIntHandler();
     // }
 
-
+        uint16_t chAB = GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
         // Background task: calculate the (approximate) mean of the values in the
         // circular buffer and display it, together with the sample number.
         sum = 0;
