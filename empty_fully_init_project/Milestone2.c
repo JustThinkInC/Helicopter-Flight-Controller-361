@@ -31,11 +31,9 @@
 // Global variables
 //*****************************************************************************
 static circBuf_t g_inBuffer;    // Buffer of size BUF_SIZE integers (sample values)
-static uint32_t g_ulSampCnt;	// Counter for the interrupts
-static uint16_t yaw = 0;//uint16_t yaw = 0;
-static uint8_t PrevCh;
-static uint8_t chA;
-static uint8_t chB;
+static uint32_t g_ulSampCnt;    // Counter for the interrupts
+static int16_t yaw = 0;//uint16_t yaw = 0;
+static uint8_t PrevChAB = 0x00;
 //*****************************************************************************
 //
 // The interrupt handler for the for SysTick interrupt.
@@ -44,12 +42,12 @@ static uint8_t chB;
 void
 SysTickIntHandler(void)
 {
-	// Initiate a conversion
-	ADCProcessorTrigger(ADC0_BASE, 3);
-	g_ulSampCnt++;
+    // Initiate a conversion
+    ADCProcessorTrigger(ADC0_BASE, 3);
+    g_ulSampCnt++;
 
-	// Button polling
-	updateButtons();
+    // Button polling
+    updateButtons();
 }
 
 //*****************************************************************************
@@ -61,17 +59,17 @@ SysTickIntHandler(void)
 void
 ADCIntHandler(void)
 {
-	uint32_t ulValue;
+    uint32_t ulValue;
 
-	// Get the single sample from ADC0.  ADC_BASE is defined in
-	// inc/hw_memmap.h
-	ADCSequenceDataGet(ADC0_BASE, 3, &ulValue);
-	
-	// Place it in the circular buffer (advancing write index)
-	writeCircBuf(&g_inBuffer, ulValue);
-	
-	// Clean up, clearing the interrupt
-	ADCIntClear(ADC0_BASE, 3);
+    // Get the single sample from ADC0.  ADC_BASE is defined in
+    // inc/hw_memmap.h
+    ADCSequenceDataGet(ADC0_BASE, 3, &ulValue);
+
+    // Place it in the circular buffer (advancing write index)
+    writeCircBuf(&g_inBuffer, ulValue);
+
+    // Clean up, clearing the interrupt
+    ADCIntClear(ADC0_BASE, 3);
 }
 
 //*****************************************************************************
@@ -80,95 +78,72 @@ ADCIntHandler(void)
 void
 initClock(void)
 {
-	// Set the clock rate to 20 MHz
-	SysCtlClockSet(SYSCTL_SYSDIV_10 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN |
-		SYSCTL_XTAL_16MHZ);
-	
-	// Set up the period for the SysTick timer.  The SysTick timer period is
-	// set as a function of the system clock.
-	SysTickPeriodSet(SysCtlClockGet() / SAMPLE_RATE_HZ);
-	
-	// Register the interrupt handler
-	SysTickIntRegister(SysTickIntHandler);
-	
-	// Enable interrupt and device
-	SysTickIntEnable();
-	SysTickEnable();
+    // Set the clock rate to 20 MHz
+    SysCtlClockSet(SYSCTL_SYSDIV_10 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN |
+        SYSCTL_XTAL_16MHZ);
+
+    // Set up the period for the SysTick timer.  The SysTick timer period is
+    // set as a function of the system clock.
+    SysTickPeriodSet(SysCtlClockGet() / SAMPLE_RATE_HZ);
+
+    // Register the interrupt handler
+    SysTickIntRegister(SysTickIntHandler);
+
+    // Enable interrupt and device
+    SysTickIntEnable();
+    SysTickEnable();
 }
 
 void
 yawIntHandler(void) {
+
     //Test
-    GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPD);
-    GPIODirModeSet(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_DIR_MODE_OUT);
-    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
+    //GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPD);
+    //GPIODirModeSet(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_DIR_MODE_OUT);
+    //GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
     uint16_t chAB = GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
-
-    //00->10
-   //11 if (a == 0x01 || a == 0x02);
-    if(GPIOPinRead(GPIO_PORTB_BASE, 0) == 1 && chA == 0 && chB == 0) {
-       // yaw--;
-        chA = 1;
-    //11->01
-    } else if (GPIOPinRead(GPIO_PORTB_BASE, 0) == 0 && chA == 1 && chB == 1) {
-       // yaw--;
-        chA = 0;
-    //10->11
-    } else if (GPIOPinRead(GPIO_PORTB_BASE, 1) == 1 && chA == 1 && chB == 0) {
-        //yaw++;
-        chB = 1;
-    //01->11
-    } else if (GPIOPinRead(GPIO_PORTB_BASE, 0) == 1 && chA == 0 && chB == 1) {
-       // yaw--;
-        chA = 0;
-    //00->01
-    } else if (GPIOPinRead(GPIO_PORTB_BASE, 1) == 1 && chA == 0 && chB == 0) {
-       //yaw++;
-        chB = 1;
-
-    //11->10
-    } else if (GPIOPinRead(GPIO_PORTB_BASE, 1) == 1 && chA == 1 && chB == 1) {
-       //yaw++;
-        chB = 0;
-
-    //10->00
-    } else if (GPIOPinRead(GPIO_PORTB_BASE, 0) == 0 && chA == 1 && chB == 0) {
-        //yaw--;
-        chA = 0;
-
-    //01->00
-    } else if (GPIOPinRead(GPIO_PORTB_BASE, 1) == 0 && chA == 0 && chB == 1) {
-       //yaw++;
-        chB = 0;
+    //displayMeanVal(chAB, "", 1);/*
+    if (chAB != PrevChAB) {
+    if (PrevChAB == 0x00) {
+        yaw = (chAB == 0x01) ? yaw + 1 : yaw + 1;
+    } else if (PrevChAB == 0x01) {
+        yaw = (chAB == 0x02) ? yaw + 1 : yaw + 1;
+    } else if (PrevChAB == 0x02) {
+        yaw = (chAB == 0x03) ? yaw + 1 : yaw + 1;
+    } else if (PrevChAB == 0x03) {
+        yaw = (chAB == 0x03) ? yaw + 1 : yaw + 1;
     }
+    PrevChAB = chAB;}
+    GPIOIntClear(GPIO_PORTB_BASE, GPIO_PIN_0);
+    GPIOIntClear(GPIO_PORTB_BASE, GPIO_PIN_1);
 
-    GPIOIntClear(GPIO_PORTB_BASE, 4);
+
 }
 
 void
 initADC(void)
 {
-	
-	// The ADC0 peripheral must be enabled for configuration and use.
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
 
-	// Enable sample sequence 3 with a processor signal trigger.  Sequence 3
-	// will do a single sample when the processor sends a signal to start the
-	// conversion.
-	ADCSequenceConfigure(ADC0_BASE, 3, ADC_TRIGGER_PROCESSOR, 0);
+    // The ADC0 peripheral must be enabled for configuration and use.
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
 
-	
-	// Configure step 0 on sequence 3
-	ADCSequenceStepConfigure(ADC0_BASE, 3, 0, ADC_CTL_CH9 | ADC_CTL_IE | ADC_CTL_END);
-	
-	// Since sample sequence 3 is now configured, it must be enabled.
-	ADCSequenceEnable(ADC0_BASE, 3);
+    // Enable sample sequence 3 with a processor signal trigger.  Sequence 3
+    // will do a single sample when the processor sends a signal to start the
+    // conversion.
+    ADCSequenceConfigure(ADC0_BASE, 3, ADC_TRIGGER_PROCESSOR, 0);
 
-	// Register the interrupt handler
-	ADCIntRegister(ADC0_BASE, 3, ADCIntHandler);
-	
-	// Enable interrupts for ADC0 sequence 3 (clears any outstanding interrupts)
-	ADCIntEnable(ADC0_BASE, 3);
+
+    // Configure step 0 on sequence 3
+    ADCSequenceStepConfigure(ADC0_BASE, 3, 0, ADC_CTL_CH9 | ADC_CTL_IE | ADC_CTL_END);
+
+    // Since sample sequence 3 is now configured, it must be enabled.
+    ADCSequenceEnable(ADC0_BASE, 3);
+
+    // Register the interrupt handler
+    ADCIntRegister(ADC0_BASE, 3, ADCIntHandler);
+
+    // Enable interrupts for ADC0 sequence 3 (clears any outstanding interrupts)
+    ADCIntEnable(ADC0_BASE, 3);
 }
 
 void
@@ -185,23 +160,24 @@ initYaw(void)
     GPIODirModeSet(GPIO_PORTB_BASE, 0, GPIO_DIR_MODE_IN);
     GPIODirModeSet(GPIO_PORTB_BASE, 1, GPIO_DIR_MODE_IN);
 
-    chA = GPIOPinRead(GPIO_PORTB_BASE, 0);
-    chB = GPIOPinRead(GPIO_PORTB_BASE, 1);
+  //  chA = GPIOPinRead(GPIO_PORTB_BASE, 0);
+  //  chB = GPIOPinRead(GPIO_PORTB_BASE, 1);
 
-    PrevCh = GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+    PrevChAB = GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
 
     // Register the interrupt handler
     GPIOIntRegister(GPIO_PORTB_BASE, yawIntHandler);
 
     // Enable interrupts for GPIO Port B sequence 3 (clears any outstanding interrupts)
-    GPIOIntEnable(GPIO_PORTB_BASE, 4);
+    GPIOIntEnable(GPIO_PORTB_BASE, GPIO_PIN_0);
+    GPIOIntEnable(GPIO_PORTB_BASE, GPIO_PIN_1);
 }
 
 void
 initDisplay(void)
 {
-	// Intialise the Orbit OLED display
-	OLEDInitialise();
+    // Intialise the Orbit OLED display
+    OLEDInitialise();
 }
 
 //*****************************************************************************
@@ -212,103 +188,93 @@ initDisplay(void)
 void
 displayMeanVal(uint16_t meanVal, char* units, uint32_t count)
 {
-	char string[17];  // 16 characters across the display
-	OLEDStringDraw("                ", 0, 1); // Clear the display
-	// Form a new string for the line.
-	usnprintf(string, sizeof(string), "Alt = %d%s", meanVal, units);
-	// Update line on display.
-	OLEDStringDraw(string, 0, 1);
+    char string[17];  // 16 characters across the display
+    OLEDStringDraw("                ", 0, 1); // Clear the display
+    // Form a new string for the line.
+    usnprintf(string, sizeof(string), "Alt = %d%s", meanVal, units);
+    // Update line on display.
+    OLEDStringDraw(string, 0, 1);
 }
 
 
 int
 main(void)
 {
-	//Counter in the for loop calculating mean of circular buffer values
-	uint16_t i;
-	int32_t sum;
+    //Counter in the for loop calculating mean of circular buffer values
+    uint16_t i;
+    int32_t sum;
 
-	initClock();
-	initButtons();
-	initADC();
-	initYaw();
-	initDisplay();
-	initCircBuf(&g_inBuffer, BUF_SIZE);
+    initClock();
+    initButtons();
+    initADC();
+    initYaw();
+    initDisplay();
+    initCircBuf(&g_inBuffer, BUF_SIZE);
 
-	// Enable interrupts to the processor.
-	IntMasterEnable();
+    // Enable interrupts to the processor.
+    IntMasterEnable();
 
-	uint16_t baseHeight = 0;
-	uint16_t currentHeight;
-	uint8_t displayStage = 0;
-	uint16_t percentage = 0;
+    uint16_t baseHeight = 0;
+    uint16_t currentHeight;
+    uint8_t displayStage = 0;
+    uint16_t percentage = 0;
 
-	while (1)
-	{
-	    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
-	            GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPU);
-	            GPIODirModeSet(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_DIR_MODE_IN);
-	            //if(!GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_4)){
-	            if(GPIOPinRead(GPIO_PORTB_BASE, 0) != chA || GPIOPinRead(GPIO_PORTB_BASE, 1) != chB) {
-	                yawIntHandler();
-	            }
+    while (1)
+    {
+
+    // if(GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1) != PrevChAB) {
+   //  yawIntHandler();
+    // }
 
 
-		// Background task: calculate the (approximate) mean of the values in the
-		// circular buffer and display it, together with the sample number.
-		sum = 0;
-		for (i = 0; i < BUF_SIZE; i++) {
-			sum = sum + readCircBuf(&g_inBuffer);
-		}
+        // Background task: calculate the (approximate) mean of the values in the
+        // circular buffer and display it, together with the sample number.
+        sum = 0;
+        for (i = 0; i < BUF_SIZE; i++) {
+            sum = sum + readCircBuf(&g_inBuffer);
+        }
 
-		// Calculate and display the rounded mean of the buffer contents
-		currentHeight = (2 * sum + BUF_SIZE) / 2 / BUF_SIZE;
+        // Calculate and display the rounded mean of the buffer contents
+        currentHeight = (2 * sum + BUF_SIZE) / 2 / BUF_SIZE;
 
+        if (baseHeight == 0) {
+            baseHeight = currentHeight;
+        }
+        else {
+            // Calculate helicopter altitude as a rounded percentage
+            percentage = ((2 * (baseHeight - currentHeight) / 8) + 1) / 2;
+            // This avoids an overflow due to negative value in above calculation
+            // Negative value would occur if calibration was done at the non-landed altitude (e.g. half height),
+            // hence any value below that would result in negative values
+            percentage = (currentHeight > baseHeight) ? 0 : percentage;
+        }
 
-
-		if (baseHeight == 0) {
-			baseHeight = currentHeight;
-		}
-		else {
-			// Calculate helicopter altitude as a rounded percentage
-			percentage = ((2 * (baseHeight - currentHeight) / 8) + 1) / 2;
-			// This avoids an overflow due to negative value in above calculation
-			// Negative value would occur if calibration was done at the non-landed altitude (e.g. half height), 
-			// hence any value below that would result in negative values
-			percentage = (currentHeight > baseHeight) ? 0 : percentage;
-		}
-
-		// Reinitialise the base height
-		if (checkButton(LEFT) == PUSHED) {
-			baseHeight = currentHeight;
-			percentage = 0;
-		}
-		// Increment the display stage in range of 0 to 2
-		if (checkButton(UP) == PUSHED) {
-			displayStage = ++displayStage % 3;
-		}
+        // Reinitialise the base height
+        if (checkButton(LEFT) == PUSHED) {
+            baseHeight = currentHeight;
+            percentage = 0;
+        }
+        // Increment the display stage in range of 0 to 2
+        if (checkButton(UP) == PUSHED) {
+            displayStage = ++displayStage % 3;
+        }
 
 
+        // Update display based on current display stage
+        switch (displayStage) {
+        case 0:
+            displayMeanVal(percentage, "%", g_ulSampCnt); // Display altitude reading as percentage
+            break;
+        case 1:
+            displayMeanVal(currentHeight, " ", g_ulSampCnt); // Display the mean height reading
+            break;
+        case 2:
+            initDisplay(); // Reset and turn off the display
+        }
 
+        displayMeanVal(yaw, "", 1);
 
-
-
-
-		// Update display based on current display stage
-		switch (displayStage) {
-		case 0:
-			displayMeanVal(percentage, "%", g_ulSampCnt); // Display altitude reading as percentage
-			break;
-		case 1:
-			displayMeanVal(currentHeight, " ", g_ulSampCnt); // Display the mean height reading
-			break;
-		case 2:
-			initDisplay(); // Reset and turn off the display
-		}
-
-		displayMeanVal(yaw, "", 1);
-
-		SysCtlDelay(SysCtlClockGet() / 15); // Update display at 10 Hz
-	}
+        SysCtlDelay(SysCtlClockGet() / 15); // Update display at 10 Hz
+    }
 }
 
