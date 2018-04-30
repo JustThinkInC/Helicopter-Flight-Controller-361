@@ -32,7 +32,8 @@
 //*****************************************************************************
 static circBuf_t g_inBuffer;    // Buffer of size BUF_SIZE integers (sample values)
 static uint32_t g_ulSampCnt;	// Counter for the interrupts
-static uint16_t yaw = 0;
+static uint16_t yaw = 0;//uint16_t yaw = 0;
+static uint8_t PrevCh;
 static uint8_t chA;
 static uint8_t chB;
 //*****************************************************************************
@@ -101,22 +102,47 @@ yawIntHandler(void) {
     GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPD);
     GPIODirModeSet(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_DIR_MODE_OUT);
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, GPIO_PIN_1);
+    uint16_t chAB = GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
 
-    if(GPIOPinRead(GPIO_PORTB_BASE, 0) == 1 && chA == 0) {
-        yaw++;
-        chA++;
-    } else if (GPIOPinRead(GPIO_PORTB_BASE, 0) == 0 && chA == 1) {
-        yaw++;
-        chA++;
-    } else if (GPIOPinRead(GPIO_PORTB_BASE, 1) == 1 && chB == 0) {
-        yaw++;
-        chB++;
-    } else if (GPIOPinRead(GPIO_PORTB_BASE, 1) == 0 && chB == 1) {
-        yaw++;
-        chB++;
+    //00->10
+   //11 if (a == 0x01 || a == 0x02);
+    if(GPIOPinRead(GPIO_PORTB_BASE, 0) == 1 && chA == 0 && chB == 0) {
+       // yaw--;
+        chA = 1;
+    //11->01
+    } else if (GPIOPinRead(GPIO_PORTB_BASE, 0) == 0 && chA == 1 && chB == 1) {
+       // yaw--;
+        chA = 0;
+    //10->11
+    } else if (GPIOPinRead(GPIO_PORTB_BASE, 1) == 1 && chA == 1 && chB == 0) {
+        //yaw++;
+        chB = 1;
+    //01->11
+    } else if (GPIOPinRead(GPIO_PORTB_BASE, 0) == 1 && chA == 0 && chB == 1) {
+       // yaw--;
+        chA = 0;
+    //00->01
+    } else if (GPIOPinRead(GPIO_PORTB_BASE, 1) == 1 && chA == 0 && chB == 0) {
+       //yaw++;
+        chB = 1;
+
+    //11->10
+    } else if (GPIOPinRead(GPIO_PORTB_BASE, 1) == 1 && chA == 1 && chB == 1) {
+       //yaw++;
+        chB = 0;
+
+    //10->00
+    } else if (GPIOPinRead(GPIO_PORTB_BASE, 0) == 0 && chA == 1 && chB == 0) {
+        //yaw--;
+        chA = 0;
+
+    //01->00
+    } else if (GPIOPinRead(GPIO_PORTB_BASE, 1) == 0 && chA == 0 && chB == 1) {
+       //yaw++;
+        chB = 0;
     }
 
-    GPIOIntClear(GPIO_PORTB_BASE, 3);
+    GPIOIntClear(GPIO_PORTB_BASE, 4);
 }
 
 void
@@ -162,10 +188,12 @@ initYaw(void)
     chA = GPIOPinRead(GPIO_PORTB_BASE, 0);
     chB = GPIOPinRead(GPIO_PORTB_BASE, 1);
 
+    PrevCh = GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+
     // Register the interrupt handler
     GPIOIntRegister(GPIO_PORTB_BASE, yawIntHandler);
 
-    // Enable interrupts for ADC0 sequence 3 (clears any outstanding interrupts)
+    // Enable interrupts for GPIO Port B sequence 3 (clears any outstanding interrupts)
     GPIOIntEnable(GPIO_PORTB_BASE, 4);
 }
 
@@ -217,6 +245,15 @@ main(void)
 
 	while (1)
 	{
+	    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+	            GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPU);
+	            GPIODirModeSet(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_DIR_MODE_IN);
+	            //if(!GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_4)){
+	            if(GPIOPinRead(GPIO_PORTB_BASE, 0) != chA || GPIOPinRead(GPIO_PORTB_BASE, 1) != chB) {
+	                yawIntHandler();
+	            }
+
+
 		// Background task: calculate the (approximate) mean of the values in the
 		// circular buffer and display it, together with the sample number.
 		sum = 0;
@@ -253,13 +290,7 @@ main(void)
 
 
 
-		SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
-		GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPU);
-		GPIODirModeSet(GPIO_PORTF_BASE, GPIO_PIN_4, GPIO_DIR_MODE_IN);
-		//if(!GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_4)){
-		if(GPIOPinRead(GPIO_PORTB_BASE, 0) != chA || GPIOPinRead(GPIO_PORTB_BASE, 1) != chB) {
-		    yawIntHandler();
-		}
+
 
 
 
@@ -275,6 +306,7 @@ main(void)
 			initDisplay(); // Reset and turn off the display
 		}
 
+		displayMeanVal(yaw, "", 1);
 
 		SysCtlDelay(SysCtlClockGet() / 15); // Update display at 10 Hz
 	}
