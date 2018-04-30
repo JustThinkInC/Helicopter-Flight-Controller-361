@@ -104,32 +104,36 @@ yawIntHandler(void) {
     uint16_t chAB = GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
     //displayMeanVal(chAB, "", 1);/*
     if (chAB != PrevChAB) {
+        //00
         if (PrevChAB == 0x00) {
             //yaw = (chAB == 0x01) ? yaw + 1 : yaw - 1;
             if (chAB == 0x01) {
                 yaw++;
-            } else if (chAB == 0x02) {
+            } else {//if (chAB == 0x02) {
                 yaw--;
             }
+        //01
         } else if (PrevChAB == 0x01) {
             //yaw = (chAB == 0x02) ? yaw + 1 : yaw - 1;
             if (chAB == 0x03) {
                 yaw++;
-            } else if (chAB == 0x00) {
+            } else {//if (chAB == 0x00) {
                 yaw--;
             }
+        //11
         } else if (PrevChAB == 0x03) {
            // yaw = (chAB == 0x00) ? yaw + 1 : yaw - 1;
             if (chAB == 0x02) {
                 yaw++;
-            } else if (chAB == 0x01) {
+            } else {//if (chAB == 0x01) {
                 yaw--;
             }
+        //10
         } else if (PrevChAB == 0x02) {
            // yaw = (chAB == 0x03) ? yaw + 1 : yaw - 1;
             if (chAB == 0x00) {
                 yaw++;
-            } else if (chAB == 0x03) {
+            } else {//if (chAB == 0x03) {
                 yaw--;
             }
         }
@@ -203,14 +207,18 @@ initDisplay(void)
 //
 //*****************************************************************************
 void
-displayMeanVal(signed int meanVal, char* units, uint32_t count)
+displayMeanVal(uint16_t meanVal, char* units, signed int degs)
 {
-    char string[17];  // 16 characters across the display
+    char heightString[17];  // 16 characters across the display
     OLEDStringDraw("                ", 0, 1); // Clear the display
     // Form a new string for the line.
-    usnprintf(string, sizeof(string), "Alt = %d%s", meanVal, units);
+    usnprintf(heightString, sizeof(heightString), "Alt = %d%s", meanVal, units);
+    char yawString[17];
+    OLEDStringDraw("                ", 0, 2);
+    usnprintf(yawString, sizeof(yawString), "Yaw = %d %s", degs, "deg");
     // Update line on display.
-    OLEDStringDraw(string, 0, 1);
+    OLEDStringDraw(heightString, 0, 1);
+    OLEDStringDraw(yawString, 0, 2);
 }
 
 
@@ -238,10 +246,6 @@ main(void)
 
     while (1)
     {
-
-    // if(GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1) != PrevChAB) {
-   //  yawIntHandler();
-    // }
 
         uint16_t chAB = GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
         // Background task: calculate the (approximate) mean of the values in the
@@ -276,20 +280,18 @@ main(void)
             displayStage = ++displayStage % 3;
         }
 
-
+        signed int degs = yaw;//(2 * (90 * (yaw) / 109) + 1) / 2;
         // Update display based on current display stage
         switch (displayStage) {
         case 0:
-            displayMeanVal(percentage, "%", g_ulSampCnt); // Display altitude reading as percentage
+            displayMeanVal(percentage, "%", degs); // Display altitude reading as percentage
             break;
         case 1:
-            displayMeanVal(currentHeight, " ", g_ulSampCnt); // Display the mean height reading
+            displayMeanVal(currentHeight, " ", degs); // Display the mean height reading
             break;
         case 2:
             initDisplay(); // Reset and turn off the display
         }
-
-        displayMeanVal(yaw, "", 1);
 
         SysCtlDelay(SysCtlClockGet() / 15); // Update display at 10 Hz
     }
