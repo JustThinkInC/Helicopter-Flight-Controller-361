@@ -113,23 +113,23 @@ yawIntHandler(void) {
             }
         } else if (PrevChAB == 0x01) {
             //yaw = (chAB == 0x02) ? yaw + 1 : yaw - 1;
-            if (chAB == 0x02) {
+            if (chAB == 0x03) {
                 yaw++;
             } else if (chAB == 0x00) {
                 yaw--;
             }
-        } else if (PrevChAB == 0x02) {
-           // yaw = (chAB == 0x03) ? yaw + 1 : yaw - 1;
-            if (chAB == 0x03) {
+        } else if (PrevChAB == 0x03) {
+           // yaw = (chAB == 0x00) ? yaw + 1 : yaw - 1;
+            if (chAB == 0x02) {
                 yaw++;
             } else if (chAB == 0x01) {
                 yaw--;
             }
-        } else if (PrevChAB == 0x03) {
-           // yaw = (chAB == 0x00) ? yaw + 1 : yaw - 1;
+        } else if (PrevChAB == 0x02) {
+           // yaw = (chAB == 0x03) ? yaw + 1 : yaw - 1;
             if (chAB == 0x00) {
                 yaw++;
-            } else if (chAB == 0x02) {
+            } else if (chAB == 0x03) {
                 yaw--;
             }
         }
@@ -180,17 +180,14 @@ initYaw(void)
     GPIODirModeSet(GPIO_PORTB_BASE, GPIO_PIN_0, GPIO_DIR_MODE_IN);
     GPIODirModeSet(GPIO_PORTB_BASE, GPIO_PIN_1, GPIO_DIR_MODE_IN);
 
-  //  chA = GPIOPinRead(GPIO_PORTB_BASE, 0);
-  //  chB = GPIOPinRead(GPIO_PORTB_BASE, 1);
-
     PrevChAB = GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
 
     // Register the interrupt handler
     GPIOIntRegister(GPIO_PORTB_BASE, yawIntHandler);
+    GPIOIntTypeSet(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1, GPIO_BOTH_EDGES);
 
     // Enable interrupts for GPIO Port B sequence 3 (clears any outstanding interrupts)
     GPIOIntEnable(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
-   // GPIOIntEnable(GPIO_PORTB_BASE, GPIO_PIN_1);
 }
 
 void
