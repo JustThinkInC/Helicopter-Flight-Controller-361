@@ -32,8 +32,9 @@
 //*****************************************************************************
 static circBuf_t g_inBuffer;    // Buffer of size BUF_SIZE integers (sample values)
 static uint32_t g_ulSampCnt;    // Counter for the interrupts
-static signed int yaw = 0;//uint16_t yaw = 0;
-static uint8_t PrevChAB = 0x00;
+static signed int yaw = 0;      // Yaw value of helicopter
+static uint8_t PrevChAB = 0x00; //Previous state of channels A & B
+static uint16_t heightPercentage = 0;
 //*****************************************************************************
 //
 // The interrupt handler for the for SysTick interrupt.
@@ -73,27 +74,10 @@ ADCIntHandler(void)
 }
 
 //*****************************************************************************
-// Initialisation functions for the clock (incl. SysTick), ADC, display
+//
+// The handler for the yaw monitor.
+//
 //*****************************************************************************
-void
-initClock(void)
-{
-    // Set the clock rate to 20 MHz
-    SysCtlClockSet(SYSCTL_SYSDIV_10 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN |
-        SYSCTL_XTAL_16MHZ);
-
-    // Set up the period for the SysTick timer.  The SysTick timer period is
-    // set as a function of the system clock.
-    SysTickPeriodSet(SysCtlClockGet() / SAMPLE_RATE_HZ);
-
-    // Register the interrupt handler
-    SysTickIntRegister(SysTickIntHandler);
-
-    // Enable interrupt and device
-    SysTickIntEnable();
-    SysTickEnable();
-}
-
 void
 yawIntHandler(void) {
 
@@ -132,6 +116,28 @@ yawIntHandler(void) {
         PrevChAB = chAB;
     }
     GPIOIntClear(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+}
+
+//*****************************************************************************
+// Initialisation functions for the clock (incl. SysTick), ADC, display
+//*****************************************************************************
+void
+initClock(void)
+{
+    // Set the clock rate to 20 MHz
+    SysCtlClockSet(SYSCTL_SYSDIV_10 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN |
+        SYSCTL_XTAL_16MHZ);
+
+    // Set up the period for the SysTick timer.  The SysTick timer period is
+    // set as a function of the system clock.
+    SysTickPeriodSet(SysCtlClockGet() / SAMPLE_RATE_HZ);
+
+    // Register the interrupt handler
+    SysTickIntRegister(SysTickIntHandler);
+
+    // Enable interrupt and device
+    SysTickIntEnable();
+    SysTickEnable();
 }
 
 void
@@ -197,12 +203,12 @@ initDisplay(void)
 //
 //*****************************************************************************
 void
-displayVal(uint16_t meanVal, char* units, signed int degs)
+displayVal(uint16_t meanVal, signed int degs)
 {
     char heightString[17];  // 16 characters across the display
     OLEDStringDraw("                ", 0, 1); // Clear the display
     // Form a new string for the line.
-    usnprintf(heightString, sizeof(heightString), "Alt = %d%s", meanVal, units);
+    usnprintf(heightString, sizeof(heightString), "Alt = %d%s", meanVal, "%");
     char yawString[17];
     OLEDStringDraw("                ", 0, 2);
     usnprintf(yawString, sizeof(yawString), "Yaw = %d %s", degs, "deg");
@@ -211,13 +217,53 @@ displayVal(uint16_t meanVal, char* units, signed int degs)
     OLEDStringDraw(yawString, 0, 2);
 }
 
+//Handle button presses
+void
+buttonPress() {
+    if (checkButton(UP) == PUSHED && heightPercentage < 100) {
+        //increase height by 10%
+        //mainFrequency += (mainFrequency / 10);
+    } else if (checkButton(DOWN) == PUSHED && heightPercentage > 0) {
+        //decrease height by 10%
+        //mainFrequency -= (mainFrequency / 10);
+    } else if (checkButton(LEFT) == PUSHED) {
+        //rotate 15degs ccw
+    } else if (checkButton(RIGHT) == PUSHED) {
+        //rotate 15degs cw
+   }
+}
+
+// Background task: calculate the (approximate) mean of the values in the
+// circular buffer and display it, together with the sample number.
+
+void
+ADCSampling() {
+    uint16_t i = 0;
+    int32_t sum;
+    uint16_t baseHeight = 0;
+    uint16_t currentHeight;
+
+    sum = 0;
+    for (; i < BUF_SIZE; i++) {
+        sum = sum + readCircBuf(&g_inBuffer);
+    }
+    // Calculate and display the rounded mean of the buffer contents
+    currentHeight = (2 * sum + BUF_SIZE) / 2 / BUF_SIZE;
+    if (baseHeight == 0) {
+        baseHeight = currentHeight;
+    }
+    else {
+        // Calculate helicopter altitude as a rounded percentage
+        heightPercentage = ((2 * (baseHeight - currentHeight) / 8) + 1) / 2;
+        heightPercentage = (currentHeight > baseHeight) ? 0 : heightPercentage;
+    }
+}
 
 int
 main(void)
 {
     //Counter in the for loop calculating mean of circular buffer values
-    uint16_t i;
-    int32_t sum;
+
 
     initClock();
     initButtons();
@@ -229,60 +275,13 @@ main(void)
     // Enable interrupts to the processor.
     IntMasterEnable();
 
-    uint16_t baseHeight = 0;
-    uint16_t currentHeight;
-    uint8_t displayStage = 0;
-    uint16_t percentage = 0;
 
     while (1)
     {
-
-        uint16_t chAB = GPIOPinRead(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
-        // Background task: calculate the (approximate) mean of the values in the
-        // circular buffer and display it, together with the sample number.
-        sum = 0;
-        for (i = 0; i < BUF_SIZE; i++) {
-            sum = sum + readCircBuf(&g_inBuffer);
-        }
-
-        // Calculate and display the rounded mean of the buffer contents
-        currentHeight = (2 * sum + BUF_SIZE) / 2 / BUF_SIZE;
-
-        if (baseHeight == 0) {
-            baseHeight = currentHeight;
-        }
-        else {
-            // Calculate helicopter altitude as a rounded percentage
-            percentage = ((2 * (baseHeight - currentHeight) / 8) + 1) / 2;
-            // This avoids an overflow due to negative value in above calculation
-            // Negative value would occur if calibration was done at the non-landed altitude (e.g. half height),
-            // hence any value below that would result in negative values
-            percentage = (currentHeight > baseHeight) ? 0 : percentage;
-        }
-
-        // Reinitialise the base height
-        if (checkButton(LEFT) == PUSHED) {
-            baseHeight = currentHeight;
-            percentage = 0;
-        }
-        // Increment the display stage in range of 0 to 2
-        if (checkButton(UP) == PUSHED) {
-            displayStage = ++displayStage % 3;
-        }
-
-        signed int degs = -1 * (2 * (4 * (yaw) / 5) + 1) / 2;
-        // Update display based on current display stage
-        switch (displayStage) {
-        case 0:
-            displayVal(percentage, "%", degs); // Display altitude reading as percentage
-            break;
-        case 1:
-            displayVal(currentHeight, " ", degs); // Display the mean height reading
-            break;
-        case 2:
-            initDisplay(); // Reset and turn off the display
-        }
-
+        ADCSampling();
+        buttonPress();
+        signed int degs = -1 * (2 * (4 * (yaw) / 5) + 1) / 2; //Convert yaw to degrees
+        displayVal(heightPercentage, degs);
         SysCtlDelay(SysCtlClockGet() / 15); // Update display at 10 Hz
     }
 }
