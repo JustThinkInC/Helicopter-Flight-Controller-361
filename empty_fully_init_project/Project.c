@@ -24,7 +24,7 @@
 //*****************************************************************************
 // Constants
 //*****************************************************************************
-#define BUF_SIZE 10
+#define BUF_SIZE 20
 #define SAMPLE_RATE_HZ 160
 
 //*****************************************************************************
@@ -34,7 +34,7 @@ static circBuf_t g_inBuffer;    // Buffer of size BUF_SIZE integers (sample valu
 static uint32_t g_ulSampCnt;    // Counter for the interrupts
 static signed int yaw = 0;      // Yaw value of helicopter
 static uint8_t PrevChAB = 0x00; //Previous state of channels A & B
-static uint16_t heightPercentage = 0;
+static uint16_t heightPercentage = 0; //Percentage of height
 //*****************************************************************************
 //
 // The interrupt handler for the for SysTick interrupt.
@@ -203,18 +203,28 @@ initDisplay(void)
 //
 //*****************************************************************************
 void
-displayVal(uint16_t meanVal, signed int degs)
+displayVal(uint16_t meanVal, signed int degs, uint8_t mainDuty, uint8_t tailDuty)
 {
     char heightString[17];  // 16 characters across the display
-    OLEDStringDraw("                ", 0, 1); // Clear the display
-    // Form a new string for the line.
-    usnprintf(heightString, sizeof(heightString), "Alt = %d%s", meanVal, "%");
+    OLEDStringDraw("                ", 0, 0); // Clear the display
+    usnprintf(heightString, sizeof(heightString), "Alt = %d %s", meanVal, "%");
+
     char yawString[17];
-    OLEDStringDraw("                ", 0, 2);
+    OLEDStringDraw("                ", 0, 1);
     usnprintf(yawString, sizeof(yawString), "Yaw = %d %s", degs, "deg");
+
+    char mainMotorString[17];
+    OLEDStringDraw("                ", 0, 2);
+    usnprintf(mainMotorString, sizeof(mainMotorString), "Main = %d %s", mainDuty, "%");
+
+    char tailMotorString[17];
+    OLEDStringDraw("                ", 0, 3);
+    usnprintf(tailMotorString, sizeof(tailMotorString), "Tail = %d %s", tailDuty, "%");
     // Update line on display.
-    OLEDStringDraw(heightString, 0, 1);
-    OLEDStringDraw(yawString, 0, 2);
+    OLEDStringDraw(heightString, 0, 0);
+    OLEDStringDraw(yawString, 0, 1);
+    OLEDStringDraw(mainMotorString, 0, 2);
+    OLEDStringDraw(tailMotorString, 0, 3);
 }
 
 //Handle button presses
@@ -238,13 +248,13 @@ buttonPress() {
 
 void
 ADCSampling() {
-    uint16_t i = 0;
     int32_t sum;
-    uint16_t baseHeight = 0;
-    uint16_t currentHeight;
+    uint8_t i = 0;
+    uint16_t currentHeight = 0;
+    static uint16_t baseHeight = 0;
 
     sum = 0;
-    for (; i < BUF_SIZE; i++) {
+    for (i = 0; i < BUF_SIZE; i++) {
         sum = sum + readCircBuf(&g_inBuffer);
     }
     // Calculate and display the rounded mean of the buffer contents
@@ -262,9 +272,7 @@ ADCSampling() {
 int
 main(void)
 {
-    //Counter in the for loop calculating mean of circular buffer values
-
-
+    //Initialisation
     initClock();
     initButtons();
     initADC();
@@ -272,17 +280,17 @@ main(void)
     initDisplay();
     initCircBuf(&g_inBuffer, BUF_SIZE);
 
+
     // Enable interrupts to the processor.
     IntMasterEnable();
-
 
     while (1)
     {
         ADCSampling();
         buttonPress();
         signed int degs = -1 * (2 * (4 * (yaw) / 5) + 1) / 2; //Convert yaw to degrees
-        displayVal(heightPercentage, degs);
-        SysCtlDelay(SysCtlClockGet() / 15); // Update display at 10 Hz
+        displayVal(heightPercentage, degs, 0, 0);
+        SysCtlDelay(SysCtlClockGet() / 30); // Update display at 10 Hz
     }
 }
 
