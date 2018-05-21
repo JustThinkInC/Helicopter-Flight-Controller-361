@@ -4,6 +4,11 @@
  *  Created on: 4/05/2018
  *      Author: ljl48
  */
+#include <stdint.h>
+#include <stdbool.h>
+#include "inc/hw_memmap.h"
+#include "driverlib/pin_map.h" //Needed for pin configure
+#include "driverlib/pwm.h"
 
 #ifndef PWMSETUP_H_
 #define PWMSETUP_H_
@@ -22,16 +27,16 @@
 #define PWM_MAIN_OUTBIT      PWM_OUT_5_BIT
 #define PWM_MAIN_PERIPH_PWM  SYSCTL_PERIPH_PWM0
 #define PWM_MAIN_PERIPH_GPIO SYSCTL_PERIPH_GPIOC
-#define PWM_MAIN_GPIO_BASE   GPIO_PORTF_BASE
-#define PWM_MAIN_GPIO_CONFIG GPIO_PF1_M1PWM5
+#define PWM_MAIN_GPIO_BASE   GPIO_PORTC_BASE
+#define PWM_MAIN_GPIO_CONFIG GPIO_PC5_M0PWM7
 #define PWM_MAIN_GPIO_PIN    GPIO_PIN_1
 
 typedef struct PWM_config_s {
-    int PWM_Periph_PWM;
-    int PWM_Periph_GPIO;
-    int PWM_GPIO_Config;
-    int PWM_Base;
-    int PWM_Pin;
+    int PWM_Type_Periph_PWM;
+    int PWM_Type_Periph_GPIO;
+    int PWM_Type_GPIO_Config;
+    int PWM_Type_Base;
+    int PWM_Type_Pin;
 } PWM_config;
 
 
