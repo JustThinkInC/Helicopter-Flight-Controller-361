@@ -409,3 +409,11 @@ Command-line arguments:  -os win32 -ws win32 -arch x86 -product com.ti.ccstudio.
 
 !ENTRY org.eclipse.cdt.core 1 0 2018-05-21 17:27:41.440
 !MESSAGE Indexed 'main_project' (9 sources, 25 headers) in 0.625 sec: 1,202 declarations; 2,143 references; 0 unresolved inclusions; 5 syntax errors; 2 unresolved names (0.06%)
+
+!ENTRY com.ti.ccstudio.debug 1 0 2018-05-21 17:49:40.710
+!MESSAGE DS_ERROR: CORTEX_M4_0: Error: Connection with the target was unexpectedly lost.
+
+
+!ENTRY com.ti.ccstudio.debug 1 0 2018-05-21 17:49:40.725
+!MESSAGE DS_ERROR: CORTEX_M4_0: Failed to remove the debug state from the target before disconnecting.  There may still be breakpoint op-codes embedded in program memory.  It is recommended that you reset the emulator before you connect and reload your program before you continue debugging
+

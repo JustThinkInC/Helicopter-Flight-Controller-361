@@ -21,6 +21,8 @@
 #include "OrbitOLED/OrbitOLEDInterface.h"
 #include "buttons4.h"
 
+#include "PWMSetup.h"
+
 //*****************************************************************************
 // Constants
 //*****************************************************************************
@@ -138,6 +140,9 @@ initClock(void)
     // Enable interrupt and device
     SysTickIntEnable();
     SysTickEnable();
+
+    // adding in the config got the PWMClock
+    SysCtlPWMClockSet(PWM_DIVIDER_CODE);
 }
 
 void
@@ -279,6 +284,29 @@ main(void)
     initYaw();
     initDisplay();
     initCircBuf(&g_inBuffer, BUF_SIZE);
+
+    // brought in for pwm intergration
+    uint32_t ui32Freq = PWM_START_RATE_HZ;
+    uint32_t duty_cycle = PWM_FIXED_DUTY;
+
+    // As a precaution, make sure that the peripherals used are reset
+    SysCtlPeripheralReset (PWM_MAIN_PERIPH_GPIO); // Used for PWM output
+    SysCtlPeripheralReset (PWM_MAIN_PERIPH_PWM);  // Main Rotor PWM
+
+    SysCtlPeripheralReset (PWM_TAIL_PERIPH_GPIO); // Used for PWM output
+    SysCtlPeripheralReset (PWM_TAIL_PERIPH_PWM);  // Main Rotor PWM
+
+    SysCtlPeripheralReset (UP_BUT_PERIPH);        // UP button GPIO
+    SysCtlPeripheralReset (DOWN_BUT_PERIPH);      // DOWN button GPIO
+
+    initialisePWM ();
+    initialisePWM_Tail();
+
+    // Initialisation is complete, so turn on the output.
+    PWMOutputState(PWM_MAIN_BASE, PWM_MAIN_OUTBIT, true);
+    PWMOutputState(PWM_TAIL_BASE, PWM_TAIL_OUTBIT, true);
+
+
 
 
     // Enable interrupts to the processor.
