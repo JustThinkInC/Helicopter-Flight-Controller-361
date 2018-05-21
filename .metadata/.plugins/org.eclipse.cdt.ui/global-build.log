@@ -1,0 +1,133 @@
+
+**** Build of configuration Debug for project main_project ****
+
+"C:\\ti\\ccsv7\\utils\\bin\\gmake" -k -j 8 all -O 
+ 
+'Building file: "../PWMSetup.c"'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="E:/lab_a02_group_10/main_project" --include_path="P:/Courses/ENCE361/lonley_liam" --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/include" --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="PWMSetup.d_raw"  "../PWMSetup.c"
+
+>> Compilation failure
+subdir_rules.mk:9: recipe for target 'PWMSetup.obj' failed
+"..\PWMSetup.h", line 39: error #20: identifier "uint32_t" is undefined
+"..\PWMSetup.h", line 39: error #20: identifier "uint32_t" is undefined
+"../PWMSetup.c", line 5: warning #225-D: function "SysCtlPeripheralEnable" declared implicitly
+"../PWMSetup.c", line 8: warning #225-D: function "GPIOPinConfigure" declared implicitly
+"../PWMSetup.c", line 10: warning #225-D: function "GPIOPinTypePWM" declared implicitly
+"../PWMSetup.c", line 14: warning #225-D: function "GPIOPinTypePWM" declared implicitly
+"../PWMSetup.c", line 15: warning #225-D: function "PWMGenConfigure" declared implicitly
+"../PWMSetup.c", line 16: error #20: identifier "PWM_GEN_MODE_UP_DOWN" is undefined
+"../PWMSetup.c", line 16: error #20: identifier "PWM_GEN_MODE_NO_SYNC" is undefined
+"../PWMSetup.c", line 18: warning #225-D: function "PWMGenEnable" declared implicitly
+"../PWMSetup.c", line 26: error #20: identifier "uint32_t" is undefined
+"../PWMSetup.c", line 26: error #20: identifier "uint32_t" is undefined
+"../PWMSetup.c", line 29: error #20: identifier "uint32_t" is undefined
+"../PWMSetup.c", line 30: warning #225-D: function "SysCtlClockGet" declared implicitly
+"../PWMSetup.c", line 32: warning #225-D: function "PWMGenPeriodSet" declared implicitly
+"../PWMSetup.c", line 32: error #20: identifier "PWM0_BASE" is undefined
+"../PWMSetup.c", line 32: error #20: identifier "PWM_GEN_2" is undefined
+"../PWMSetup.c", line 33: warning #225-D: function "PWMPulseWidthSet" declared implicitly
+"../PWMSetup.c", line 33: error #20: identifier "PWM_OUT_5" is undefined
+10 errors detected in the compilation of "../PWMSetup.c".
+gmake: *** [PWMSetup.obj] Error 1
+'Building file: "../circBufT.c"'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="E:/lab_a02_group_10/main_project" --include_path="P:/Courses/ENCE361/lonley_liam" --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/include" --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="circBufT.d_raw"  "../circBufT.c"
+'Finished building: "../circBufT.c"'
+ 
+'Building file: "../tm4c123gh6pm_startup_ccs.c"'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="E:/lab_a02_group_10/main_project" --include_path="P:/Courses/ENCE361/lonley_liam" --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/include" --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="tm4c123gh6pm_startup_ccs.d_raw"  "../tm4c123gh6pm_startup_ccs.c"
+'Finished building: "../tm4c123gh6pm_startup_ccs.c"'
+ 
+'Building file: "../buttons4.c"'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="E:/lab_a02_group_10/main_project" --include_path="P:/Courses/ENCE361/lonley_liam" --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/include" --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="buttons4.d_raw"  "../buttons4.c"
+'Finished building: "../buttons4.c"'
+ 
+'Building file: "P:/Courses/ENCE361/lonley_liam/OrbitOLED/lib_OrbitOled/FillPat.c"'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="E:/lab_a02_group_10/main_project" --include_path="P:/Courses/ENCE361/lonley_liam" --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/include" --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="OrbitOLED/lib_OrbitOled/FillPat.d_raw" --obj_directory="OrbitOLED/lib_OrbitOled"  "P:/Courses/ENCE361/lonley_liam/OrbitOLED/lib_OrbitOled/FillPat.c"
+'Finished building: "P:/Courses/ENCE361/lonley_liam/OrbitOLED/lib_OrbitOled/FillPat.c"'
+ 
+'Building file: "P:/Courses/ENCE361/lonley_liam/OrbitOLED/lib_OrbitOled/ChrFont0.c"'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="E:/lab_a02_group_10/main_project" --include_path="P:/Courses/ENCE361/lonley_liam" --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/include" --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="OrbitOLED/lib_OrbitOled/ChrFont0.d_raw" --obj_directory="OrbitOLED/lib_OrbitOled"  "P:/Courses/ENCE361/lonley_liam/OrbitOLED/lib_OrbitOled/ChrFont0.c"
+'Finished building: "P:/Courses/ENCE361/lonley_liam/OrbitOLED/lib_OrbitOled/ChrFont0.c"'
+ 
+'Building file: "../Project.c"'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="E:/lab_a02_group_10/main_project" --include_path="P:/Courses/ENCE361/lonley_liam" --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/include" --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="Project.d_raw"  "../Project.c"
+'Finished building: "../Project.c"'
+ 
+'Building file: "P:/Courses/ENCE361/lonley_liam/OrbitOLED/OrbitOLEDInterface.c"'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="E:/lab_a02_group_10/main_project" --include_path="P:/Courses/ENCE361/lonley_liam" --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/include" --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="OrbitOLED/OrbitOLEDInterface.d_raw" --obj_directory="OrbitOLED"  "P:/Courses/ENCE361/lonley_liam/OrbitOLED/OrbitOLEDInterface.c"
+'Finished building: "P:/Courses/ENCE361/lonley_liam/OrbitOLED/OrbitOLEDInterface.c"'
+ 
+'Building file: "P:/Courses/ENCE361/lonley_liam/OrbitOLED/lib_OrbitOled/OrbitOled.c"'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="E:/lab_a02_group_10/main_project" --include_path="P:/Courses/ENCE361/lonley_liam" --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/include" --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="OrbitOLED/lib_OrbitOled/OrbitOled.d_raw" --obj_directory="OrbitOLED/lib_OrbitOled"  "P:/Courses/ENCE361/lonley_liam/OrbitOLED/lib_OrbitOled/OrbitOled.c"
+'Finished building: "P:/Courses/ENCE361/lonley_liam/OrbitOLED/lib_OrbitOled/OrbitOled.c"'
+ 
+'Building file: "C:/ti/TivaWare_C_Series-2.1.4.178/utils/ustdlib.c"'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="E:/lab_a02_group_10/main_project" --include_path="P:/Courses/ENCE361/lonley_liam" --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/include" --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="ustdlib.d_raw"  "C:/ti/TivaWare_C_Series-2.1.4.178/utils/ustdlib.c"
+'Finished building: "C:/ti/TivaWare_C_Series-2.1.4.178/utils/ustdlib.c"'
+ 
+'Building file: "P:/Courses/ENCE361/lonley_liam/OrbitOLED/lib_OrbitOled/OrbitOledChar.c"'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="E:/lab_a02_group_10/main_project" --include_path="P:/Courses/ENCE361/lonley_liam" --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/include" --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="OrbitOLED/lib_OrbitOled/OrbitOledChar.d_raw" --obj_directory="OrbitOLED/lib_OrbitOled"  "P:/Courses/ENCE361/lonley_liam/OrbitOLED/lib_OrbitOled/OrbitOledChar.c"
+'Finished building: "P:/Courses/ENCE361/lonley_liam/OrbitOLED/lib_OrbitOled/OrbitOledChar.c"'
+ 
+'Building file: "P:/Courses/ENCE361/lonley_liam/OrbitOLED/lib_OrbitOled/OrbitOledGrph.c"'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="E:/lab_a02_group_10/main_project" --include_path="P:/Courses/ENCE361/lonley_liam" --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/include" --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="OrbitOLED/lib_OrbitOled/OrbitOledGrph.d_raw" --obj_directory="OrbitOLED/lib_OrbitOled"  "P:/Courses/ENCE361/lonley_liam/OrbitOLED/lib_OrbitOled/OrbitOledGrph.c"
+"P:/Courses/ENCE361/lonley_liam/OrbitOLED/lib_OrbitOled/OrbitOledGrph.c", line 615: warning #552-D: variable "bTmp" was set but never used
+"P:/Courses/ENCE361/lonley_liam/OrbitOLED/lib_OrbitOled/OrbitOledGrph.c", line 818: warning #552-D: variable "pbBmp" was set but never used
+'Finished building: "P:/Courses/ENCE361/lonley_liam/OrbitOLED/lib_OrbitOled/OrbitOledGrph.c"'
+ 
+'Building file: "P:/Courses/ENCE361/lonley_liam/OrbitOLED/lib_OrbitOled/delay.c"'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="E:/lab_a02_group_10/main_project" --include_path="P:/Courses/ENCE361/lonley_liam" --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/include" --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="OrbitOLED/lib_OrbitOled/delay.d_raw" --obj_directory="OrbitOLED/lib_OrbitOled"  "P:/Courses/ENCE361/lonley_liam/OrbitOLED/lib_OrbitOled/delay.c"
+'Finished building: "P:/Courses/ENCE361/lonley_liam/OrbitOLED/lib_OrbitOled/delay.c"'
+ 
+gmake: Target 'all' not remade because of errors.
+
+**** Build Finished ****
+
+**** Build of configuration Debug for project main_project ****
+
+"C:\\ti\\ccsv7\\utils\\bin\\gmake" -k -j 8 all -O 
+ 
+'Building file: "../PWMSetup.c"'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="E:/lab_a02_group_10/main_project" --include_path="P:/Courses/ENCE361/lonley_liam" --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/include" --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="PWMSetup.d_raw"  "../PWMSetup.c"
+'Finished building: "../PWMSetup.c"'
+ 
+'Building target: "main_project.out"'
+'Invoking: ARM Linker'
+"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"main_project.map" --heap_size=0 --stack_size=512 -i"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/lib" -i"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="main_project_linkInfo.xml" --rom_model -o "main_project.out" "./PWMSetup.obj" "./Project.obj" "./buttons4.obj" "./circBufT.obj" "./tm4c123gh6pm_startup_ccs.obj" "./ustdlib.obj" "./OrbitOLED/OrbitOLEDInterface.obj" "./OrbitOLED/lib_OrbitOled/ChrFont0.obj" "./OrbitOLED/lib_OrbitOled/FillPat.obj" "./OrbitOLED/lib_OrbitOled/OrbitOled.obj" "./OrbitOLED/lib_OrbitOled/OrbitOledChar.obj" "./OrbitOLED/lib_OrbitOled/OrbitOledGrph.obj" "./OrbitOLED/lib_OrbitOled/delay.obj" "../tm4c123gh6pm.cmd"  -llibc.a -l"C:/ti/TivaWare_C_Series-2.1.4.178/driverlib/ccs/Debug/driverlib.lib" 
+<Linking>
+'Finished building target: "main_project.out"'
+ 
+
+**** Build Finished ****
+
+**** Build of configuration Debug for project main_project ****
+
+"C:\\ti\\ccsv7\\utils\\bin\\gmake" -k -j 8 all -O 
+ 
+'Building file: "../PWMSetup.c"'
+'Invoking: ARM Compiler'
+"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --include_path="E:/lab_a02_group_10/main_project" --include_path="P:/Courses/ENCE361/lonley_liam" --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" --include_path="C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/include" --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi --preproc_with_compile --preproc_dependency="PWMSetup.d_raw"  "../PWMSetup.c"
+'Finished building: "../PWMSetup.c"'
+ 
+'Building target: "main_project.out"'
+'Invoking: ARM Linker'
+"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"main_project.map" --heap_size=0 --stack_size=512 -i"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/lib" -i"C:/ti/ccsv7/tools/compiler/ti-cgt-arm_16.9.6.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="main_project_linkInfo.xml" --rom_model -o "main_project.out" "./PWMSetup.obj" "./Project.obj" "./buttons4.obj" "./circBufT.obj" "./tm4c123gh6pm_startup_ccs.obj" "./ustdlib.obj" "./OrbitOLED/OrbitOLEDInterface.obj" "./OrbitOLED/lib_OrbitOled/ChrFont0.obj" "./OrbitOLED/lib_OrbitOled/FillPat.obj" "./OrbitOLED/lib_OrbitOled/OrbitOled.obj" "./OrbitOLED/lib_OrbitOled/OrbitOledChar.obj" "./OrbitOLED/lib_OrbitOled/OrbitOledGrph.obj" "./OrbitOLED/lib_OrbitOled/delay.obj" "../tm4c123gh6pm.cmd"  -llibc.a -l"C:/ti/TivaWare_C_Series-2.1.4.178/driverlib/ccs/Debug/driverlib.lib" 
+<Linking>
+'Finished building target: "main_project.out"'
+ 
+
+**** Build Finished ****
