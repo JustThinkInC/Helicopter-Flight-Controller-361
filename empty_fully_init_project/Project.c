@@ -20,12 +20,14 @@
 #include "circBufT.h"
 #include "OrbitOLED/OrbitOLEDInterface.h"
 #include "buttons4.h"
+#include "PWMSetup.h"
 
 //*****************************************************************************
 // Constants
 //*****************************************************************************
 #define BUF_SIZE 20
 #define SAMPLE_RATE_HZ 160
+#define SWITCH_ONE GPIO_PIN_4
 
 //*****************************************************************************
 // Global variables
@@ -35,6 +37,9 @@ static uint32_t g_ulSampCnt;    // Counter for the interrupts
 static signed int yaw = 0;      // Yaw value of helicopter
 static uint8_t PrevChAB = 0x00; //Previous state of channels A & B
 static uint16_t heightPercentage = 0; //Percentage of height
+
+static uint32_t ui32Freq = PWM_START_RATE_HZ;
+static uint32_t duty_cycle = PWM_FIXED_DUTY;
 //*****************************************************************************
 //
 // The interrupt handler for the for SysTick interrupt.
@@ -49,6 +54,12 @@ SysTickIntHandler(void)
 
     // Button polling
     updateButtons();
+}
+
+void
+initMainMotor(void) {
+    PWM_config config= {PWM_MAIN_PERIPH_PWM, PWM_MAIN_PERIPH_GPIO, PWM_MAIN_GPIO_CONFIG, PWM_MAIN_GPIO_PIN};
+    setPWM(PWM_START_RATE_HZ, PWM_FIXED_DUTY);
 }
 
 //*****************************************************************************
@@ -203,7 +214,7 @@ initDisplay(void)
 //
 //*****************************************************************************
 void
-displayVal(uint16_t meanVal, signed int degs, uint8_t mainDuty, uint8_t tailDuty)
+displayVal(uint16_t meanVal, signed int degs, uint32_t mainDuty, uint32_t tailDuty)
 {
     char heightString[17];  // 16 characters across the display
     OLEDStringDraw("                ", 0, 0); // Clear the display
@@ -231,6 +242,9 @@ displayVal(uint16_t meanVal, signed int degs, uint8_t mainDuty, uint8_t tailDuty
 void
 buttonPress() {
     if (checkButton(UP) == PUSHED && heightPercentage < 100) {
+        ui32Freq += 10;
+        duty_cycle += 10;
+        //setPWM(ui32Freq, duty_cycle);
         //increase height by 10%
         //mainFrequency += (mainFrequency / 10);
     } else if (checkButton(DOWN) == PUSHED && heightPercentage > 0) {
@@ -240,6 +254,7 @@ buttonPress() {
         //rotate 15degs ccw
     } else if (checkButton(RIGHT) == PUSHED) {
         //rotate 15degs cw
+
    }
 }
 
@@ -272,6 +287,8 @@ ADCSampling() {
 int
 main(void)
 {
+
+
     //Initialisation
     initClock();
     initButtons();
@@ -280,6 +297,7 @@ main(void)
     initDisplay();
     initCircBuf(&g_inBuffer, BUF_SIZE);
 
+    GPIOPadConfigSet(GPIO_PORTF_BASE, SWITCH_ONE, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPU);
 
     // Enable interrupts to the processor.
     IntMasterEnable();
@@ -289,7 +307,13 @@ main(void)
         ADCSampling();
         buttonPress();
         signed int degs = -1 * (2 * (4 * (yaw) / 5) + 1) / 2; //Convert yaw to degrees
-        displayVal(heightPercentage, degs, 0, 0);
+
+//        if (checkButton(UP) == PUSHED) {
+//            ui32Freq += 10; duty_cycle += 10;
+//            setPWM(ui32Freq, duty_cycle);
+//        }
+
+        displayVal(heightPercentage, degs, duty_cycle, ui32Freq);
         SysCtlDelay(SysCtlClockGet() / 30); // Update display at 10 Hz
     }
 }
