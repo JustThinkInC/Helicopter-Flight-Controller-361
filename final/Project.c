@@ -23,6 +23,7 @@
 
 // Moduals developed by group
 #include "PWMSetup.h"
+#include "PID.h"
 
 //*****************************************************************************
 // Constants
@@ -334,6 +335,8 @@ main(void)
 //            setPWM(ui32Freq, duty_cycle);
 //        }
 
+        duty_cycle = proportionalControl(50, heightPercentage);
+        setPWM(ui32Freq, duty_cycle);
         displayVal(heightPercentage, degs, duty_cycle, ui32Freq);
         SysCtlDelay(SysCtlClockGet() / 30); // Update display at 10 Hz
     }
