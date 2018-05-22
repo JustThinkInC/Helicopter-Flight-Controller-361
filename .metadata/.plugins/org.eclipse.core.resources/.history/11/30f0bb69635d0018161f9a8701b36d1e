@@ -1,0 +1,6 @@
+#include "PID.h"
+
+int propotinalControl(uint32_t target, uint32_t current){
+    int error = target - current;
+    return error;
+}

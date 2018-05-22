@@ -1,0 +1,10 @@
+#include "PID.h"
+
+typedef struct_s {
+
+};
+
+int propotinalControl(uint32_t target, uint32_t current){
+    int error = target - current;
+    return error;
+}

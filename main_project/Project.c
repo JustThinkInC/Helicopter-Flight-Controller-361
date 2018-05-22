@@ -208,7 +208,7 @@ initDisplay(void)
 //
 //*****************************************************************************
 void
-displayVal(uint16_t meanVal, signed int degs, uint8_t mainDuty, uint8_t tailDuty)
+displayVal(uint16_t meanVal, signed int degs, uint32_t mainDuty, uint32_t tailDuty)
 {
     char heightString[17];  // 16 characters across the display
     OLEDStringDraw("                ", 0, 0); // Clear the display
@@ -277,6 +277,16 @@ ADCSampling() {
 int
 main(void)
 {
+    // As a precaution, make sure that the peripherals used are reset
+    SysCtlPeripheralReset (PWM_MAIN_PERIPH_GPIO); // Used for PWM output
+    SysCtlPeripheralReset (PWM_MAIN_PERIPH_PWM);  // Main Rotor PWM
+
+    SysCtlPeripheralReset (PWM_TAIL_PERIPH_GPIO); // Used for PWM output
+    SysCtlPeripheralReset (PWM_TAIL_PERIPH_PWM);  // Main Rotor PWM
+
+    SysCtlPeripheralReset (UP_BUT_PERIPH);        // UP button GPIO
+    SysCtlPeripheralReset (DOWN_BUT_PERIPH);      // DOWN button GPIO
+
     //Initialisation
     initClock();
     initButtons();
@@ -289,15 +299,7 @@ main(void)
     uint32_t ui32Freq = PWM_START_RATE_HZ;
     uint32_t duty_cycle = PWM_FIXED_DUTY;
 
-    // As a precaution, make sure that the peripherals used are reset
-    SysCtlPeripheralReset (PWM_MAIN_PERIPH_GPIO); // Used for PWM output
-    SysCtlPeripheralReset (PWM_MAIN_PERIPH_PWM);  // Main Rotor PWM
 
-    SysCtlPeripheralReset (PWM_TAIL_PERIPH_GPIO); // Used for PWM output
-    SysCtlPeripheralReset (PWM_TAIL_PERIPH_PWM);  // Main Rotor PWM
-
-    SysCtlPeripheralReset (UP_BUT_PERIPH);        // UP button GPIO
-    SysCtlPeripheralReset (DOWN_BUT_PERIPH);      // DOWN button GPIO
 
     initialisePWM ();
     initialisePWM_Tail();

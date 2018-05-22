@@ -1,0 +1,14 @@
+/*
+ * PID.h
+ *
+ *  Created on: 21/05/2018
+ *      Author: ljl48
+ */
+
+#ifndef PID_H_
+#define PID_H_
+#include <stdint.h>
+
+int propotinalControl(int setPoint, int mesurment);
+
+#endif /* PID_H_ */

@@ -1,0 +1,6 @@
+#include "PID.h"
+
+int propotinalControl(int setPoint, int mesurment){
+    int error = setPoint - mesurment;
+    return error;
+}
