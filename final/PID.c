@@ -9,9 +9,9 @@
 } PID;
 */
 
-static uint32_t kp = 1;
+static uint32_t kp = 5;
 static uint32_t ki = 1;
-static uint32_t kd = 1;
+static uint32_t kd = 5;
 static uint32_t prevError = 0;
 static uint32_t prevT = 0;
 
@@ -51,8 +51,8 @@ uint32_t proportionalControl(uint32_t target, uint32_t current){
     prevError = error;
     prevT = T;
 
-    if (control > 90) {
-        control = 90;
+    if (control > 80) {
+        control = 80;
     } else if (control < 5) {
         control = 5;
     } else {
