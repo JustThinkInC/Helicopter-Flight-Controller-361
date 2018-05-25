@@ -41,8 +41,10 @@ static signed int yaw = 0;      // Yaw value of helicopter
 static uint8_t PrevChAB = 0x00; //Previous state of channels A & B
 static uint16_t heightPercentage = 0; //Percentage of height
 
-static uint32_t ui32Freq = PWM_START_RATE_HZ;
-static uint32_t duty_cycle = PWM_FIXED_DUTY;
+static uint32_t mainFreq = PWM_START_RATE_HZ;
+static uint32_t tailFreq = PWM_START_RATE_HZ;
+static uint32_t mainDutyCycle = PWM_FIXED_DUTY;
+static uint32_t tailDutyCycle = PWM_FIXED_DUTY;
 //*****************************************************************************
 //
 // The interrupt handler for the for SysTick interrupt.
@@ -244,8 +246,8 @@ displayVal(uint16_t meanVal, signed int degs, uint32_t mainDuty, uint32_t tailDu
 void
 buttonPress() {
     if (checkButton(UP) == PUSHED && heightPercentage < 100) {
-        ui32Freq += 10;
-        duty_cycle += 10;
+        mainFreq += 10;
+        mainDutyCycle += 10;
         //setPWM(ui32Freq, duty_cycle);
         //increase height by 10%
         //mainFrequency += (mainFrequency / 10);
@@ -312,9 +314,6 @@ main(void)
     initialisePWM();
     initialisePWM_Tail();
 
-    uint32_t ui32Freq = PWM_START_RATE_HZ;
-    uint32_t duty_cycle = PWM_FIXED_DUTY;
-
     GPIOPadConfigSet(GPIO_PORTF_BASE, SWITCH_ONE, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPU);
 
     // Initialisation is complete, so turn on the output.
@@ -334,10 +333,13 @@ main(void)
 //            ui32Freq += 10; duty_cycle += 10;
 //            setPWM(ui32Freq, duty_cycle);
 //        }
-
-        duty_cycle = proportionalControl(50, heightPercentage);
-        setPWM(ui32Freq, duty_cycle);
-        displayVal(heightPercentage, degs, duty_cycle, ui32Freq);
+        uint32_t target = ((heightPercentage + 10) < 100)? heightPercentage + 10 : 100;
+        mainDutyCycle = proportionalControl(target, heightPercentage);
+        heightPercentage = target;
+        setPWM(mainFreq, mainDutyCycle);
+        tailDutyCycle = proportionalControl(50, yaw);
+        setPWM_Tail(tailFreq, tailDutyCycle);
+        displayVal(heightPercentage, degs, mainDutyCycle, mainFreq);
         SysCtlDelay(SysCtlClockGet() / 30); // Update display at 10 Hz
     }
 }

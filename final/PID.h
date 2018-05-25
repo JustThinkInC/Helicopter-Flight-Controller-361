@@ -9,6 +9,6 @@
 #define PID_H_
 #include <stdint.h>
 
-int proportionalControl(uint32_t target, uint32_t current);
+uint32_t proportionalControl(uint32_t target, uint32_t current);
 
 #endif /* PID_H_ */
