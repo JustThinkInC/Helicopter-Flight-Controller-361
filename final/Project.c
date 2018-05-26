@@ -24,6 +24,7 @@
 // Moduals developed by group
 #include "PWMSetup.h"
 #include "PID.h"
+#include "uart.h"
 
 //*****************************************************************************
 // Constants
@@ -45,6 +46,11 @@ static uint32_t mainFreq = PWM_START_RATE_HZ;
 static uint32_t tailFreq = PWM_START_RATE_HZ;
 static uint32_t mainDutyCycle = PWM_FIXED_DUTY;
 static uint32_t tailDutyCycle = PWM_FIXED_DUTY;
+
+static uint32_t slowTick = 0;
+#define MAX_TICK 100
+bool isSlowTick = false;
+
 //*****************************************************************************
 //
 // The interrupt handler for the for SysTick interrupt.
@@ -56,6 +62,11 @@ SysTickIntHandler(void)
     // Initiate a conversion
     ADCProcessorTrigger(ADC0_BASE, 3);
     g_ulSampCnt++;
+    slowTick ++;
+    if (slowTick > MAX_TICK){
+        slowTick = 0;
+        isSlowTick = true;
+    }
 
     // Button polling
     updateButtons();
@@ -309,6 +320,7 @@ main(void)
     initYaw();
     initDisplay();
     initCircBuf(&g_inBuffer, BUF_SIZE);
+    initialiseUSB_UART();
 
     // added for pwm
     initialisePWM();
@@ -341,6 +353,12 @@ main(void)
         //setPWM_Tail(tailFreq, tailDutyCycle);
         displayVal(heightPercentage, degs, mainDutyCycle, mainFreq);
         SysCtlDelay(SysCtlClockGet() / 30); // Update display at 10 Hz
+        if(isSlowTick){
+            UARTSend("Cool \r");
+            isSlowTick = false;
+        }
+
+
     }
 }
 
