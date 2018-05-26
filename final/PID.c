@@ -16,26 +16,6 @@ static uint32_t prevError = 0;
 static uint32_t prevT = 0;
 
 uint32_t proportionalControl(uint32_t target, uint32_t current){
-    /*static uint32_t I;
-    static uint32_t T;
-    uint32_t error = target - current;
-    uint32_t P = proportion * error;
-    uint32_t dI = error * (T-prevT);
-   // I += error * (T-prevT);
-    uint32_t D = (error - prevError) / (T - prevT);
-    uint32_t control = P+(I+dI)+D;
-    prevError = error;
-    prevT = T;
-
-    if  (control > 90) {
-        control = 90;
-    } else if  (control < 5) {
-        control = 5;
-    } else {
-        I += dI;
-    }
-    //uint32_t D = ((2*kd+T)/T/2) * (error-prevError);*/
-
     static uint32_t T;
     static uint32_t error_integrated;
     uint32_t error_derivative;
@@ -56,7 +36,7 @@ uint32_t proportionalControl(uint32_t target, uint32_t current){
     } else if (control < 5) {
         control = 5;
     } else {
-        error_integrated + dI;
+        error_integrated += dI;
     }
 
     return control;
