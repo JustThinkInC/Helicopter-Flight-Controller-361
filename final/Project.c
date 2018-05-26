@@ -333,7 +333,7 @@ main(void)
 //            ui32Freq += 10; duty_cycle += 10;
 //            setPWM(ui32Freq, duty_cycle);
 //        }
-        uint32_t target = ((heightPercentage + 10) < 90)? heightPercentage + 10 : 90;
+        uint32_t target = ((heightPercentage + 10) < 50)? heightPercentage + 10 : 50;
         mainDutyCycle = proportionalControl(target, heightPercentage);
         heightPercentage = target;
         setPWM(mainFreq, mainDutyCycle);
