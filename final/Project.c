@@ -246,11 +246,10 @@ displayVal(uint16_t meanVal, signed int degs, uint32_t mainDuty, uint32_t tailDu
 void
 buttonPress() {
     if (checkButton(UP) == PUSHED && heightPercentage < 100) {
-        mainFreq += 10;
-        mainDutyCycle += 10;
-        //setPWM(ui32Freq, duty_cycle);
-        //increase height by 10%
-        //mainFrequency += (mainFrequency / 10);
+        uint32_t target = ((heightPercentage + 10) <= 100) ? heightPercentage + 10 : 0;
+       mainDutyCycle = proportionalControl(target, heightPercentage);
+       heightPercentage = target;
+       setPWM(mainFreq, mainDutyCycle);
     } else if (checkButton(DOWN) == PUSHED && heightPercentage > 0) {
         //decrease height by 10%
         //mainFrequency -= (mainFrequency / 10);
@@ -333,10 +332,10 @@ main(void)
 //            ui32Freq += 10; duty_cycle += 10;
 //            setPWM(ui32Freq, duty_cycle);
 //        }
-        uint32_t target = ((heightPercentage + 10) < 50)? heightPercentage + 10 : 50;
-        mainDutyCycle = proportionalControl(target, heightPercentage);
-        heightPercentage = target;
-        setPWM(mainFreq, mainDutyCycle);
+      //  uint32_t target = ((heightPercentage + 10) <= 10)? heightPercentage + 10 : 10;
+        //mainDutyCycle = proportionalControl(target, heightPercentage);
+        //heightPercentage = target;
+        ///setPWM(mainFreq, mainDutyCycle);
         //tailDutyCycle = proportionalControl(50, yaw);
         //setPWM_Tail(tailFreq, tailDutyCycle);
         displayVal(heightPercentage, degs, mainDutyCycle, mainFreq);
