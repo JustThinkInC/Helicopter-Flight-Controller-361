@@ -27,7 +27,7 @@ initialisePWM (void)
     PWMGenConfigure(PWM_MAIN_BASE, PWM_MAIN_GEN,
                     PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
     // Set the initial PWM parameters
-    setPWM (PWM_START_RATE_HZ, PWM_FIXED_DUTY);
+    //setPWM (PWM_START_RATE_HZ, PWM_FIXED_DUTY);
 
     PWMGenEnable(PWM_MAIN_BASE, PWM_MAIN_GEN);
 
@@ -46,7 +46,7 @@ initialisePWM_Tail(void){
     PWMGenConfigure(PWM_TAIL_BASE, PWM_TAIL_GEN,
                     PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
     // Set the initial PWM parameters
-    setPWM_Tail (PWM_START_RATE_HZ, PWM_FIXED_DUTY);
+   // setPWM_Tail (PWM_START_RATE_HZ, PWM_FIXED_DUTY);
 
     PWMGenEnable(PWM_TAIL_BASE, PWM_TAIL_GEN);
 
