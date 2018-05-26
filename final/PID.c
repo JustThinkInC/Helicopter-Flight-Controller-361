@@ -9,9 +9,9 @@
 } PID;
 */
 
-static uint32_t kp = 5;
-static uint32_t ki = 1;
-static uint32_t kd = 5;
+static uint32_t kp = 4;
+static uint32_t ki = 3;
+static uint32_t kd = 2;
 static uint32_t prevError = 0;
 static uint32_t prevT = 0;
 
