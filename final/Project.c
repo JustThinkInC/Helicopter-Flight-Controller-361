@@ -317,7 +317,7 @@ ADCSampling() {
     }
     else {
         // Calculate helicopter altitude as a rounded percentage
-        heightPercentage = ((2 * (baseHeight - currentHeight) / 8) + 1) / 2;
+        heightPercentage = ((baseHeight - currentHeight) + (14/2)) / 14;// * 4 + (7/2)) / 7;//((2 * 7 * (baseHeight - currentHeight) / 4) + 1) / 2;
         heightPercentage = (currentHeight > baseHeight) ? 0 : heightPercentage;
     }
 }

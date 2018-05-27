@@ -1,9 +1,9 @@
 #include "PID.h"
 
 //Variables for main
-static float kp = 1;
-static float ki = 0.0009;
-static float kd = 0.8;
+static float kp = 0.7;//1;
+static float ki = 2;//0.0009;
+static float kd = 1;//0.8;
 static signed int prevError = 0;
 static float error_integrated = 0;
 
@@ -14,7 +14,7 @@ static float kd_tail = 1;
 static signed int prevError_tail = 0;
 static float error_integrated_tail = 0;
 
-int pidControlMain(uint32_t target, uint32_t current){
+/*int pidControlMain(uint32_t target, uint32_t current){
     float error_derivative_main;
     signed int control_main;
 
@@ -36,7 +36,35 @@ int pidControlMain(uint32_t target, uint32_t current){
     }
 
     return control_main;
+}*/
+
+uint32_t pidControlMain(uint32_t target, uint32_t current) {
+    static uint32_t T;
+    uint32_t error_derivative;
+    uint32_t control;
+
+
+    uint32_t error = target - current;
+    error_integrated += error * (160);  //I
+    error_derivative = ((2 * (error - prevError)) + (160)) / 2 / (160); //D
+    uint32_t dI = ki * error * 160;
+    control = error * kp ;//+ (error_integrated * ki + dI) + error_derivative * kd;
+
+    prevError = error;
+
+    if (control > 80) {
+        control = 80;
+    } else if (control < 5) {
+        control = 5;
+    } else {
+        error_integrated += dI;
+    }
+
+    return control;
 }
+
+
+
 
 
 int pidControlTail(signed int target, signed int current) {
