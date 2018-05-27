@@ -8,7 +8,7 @@
 #ifndef PID_H_
 #define PID_H_
 #include <stdint.h>
-
+#include <uart.h>
 uint32_t proportionalControl(uint32_t target, uint32_t current);
-
+int pidControlTail(signed int target, signed int current);
 #endif /* PID_H_ */
