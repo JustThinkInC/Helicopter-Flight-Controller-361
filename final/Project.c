@@ -43,11 +43,15 @@ static signed int prevYaw = 0;  // Previuos Yaw
 static uint8_t PrevChAB = 0x00; //Previous state of channels A & B
 static uint16_t heightPercentage = 0; //Percentage of height
 
+static uint16_t currentHeight = 0;
+static uint16_t baseHeight = 0;
+
 static uint32_t mainFreq = PWM_START_RATE_HZ;
 static uint32_t tailFreq = PWM_START_RATE_HZ;
 static uint32_t mainDutyCycle = PWM_FIXED_DUTY;
 static uint32_t tailDutyCycle = PWM_FIXED_DUTY;
-uint32_t target = 0;
+
+uint32_t targetHeight = 0;
 signed int targetTail = 0;
 signed int degs = 0;
 
@@ -261,32 +265,35 @@ displayVal(uint16_t meanVal, signed int degs, uint32_t mainDuty, uint32_t tailDu
 void
 buttonPress() {
     if (checkButton(UP) == PUSHED && heightPercentage < 100) {
-    //   target = 10;//((heightPercentage + 10) <= 100) ? heightPercentage + 10 : 100;
-      // mainDutyCycle = proportionalControl(target, heightPercentage);
-      // heightPercentage = target;
-       setPWM(mainFreq, 40);
+        if (targetHeight + 10 <= 100) {
+            targetHeight += 10;
+        } else {
+            targetHeight = 100;
+        }
+        mainDutyCycle = pidControlMain(targetHeight, heightPercentage);
+        setPWM(mainFreq, mainDutyCycle);
+
+        char string[50];
+        usnprintf(string, sizeof(string), "%d %d \n\r", targetHeight, heightPercentage);
+        UARTSend(string);
 
     } else if (checkButton(DOWN) == PUSHED && heightPercentage > 0) {
         //decrease height by 10%
         //mainFrequency -= (mainFrequency / 10);
     } else if (checkButton(LEFT) == PUSHED) {
         //rotate 15degs ccw
-       // degs = -1 * ((2 * (4 * yaw) + 5) / 5 /2 );//-1 * (2 * (4 * (yaw) / 5) + 1) / 2;
         degs = -1 * (yaw * 4 + (5/2)) / 5;
-        targetTail -= 15;//degs+15;//(2*(degs+prevYaw) + 2) / 2/ 2;//-1 * (degs - prevYaw);// <= 360)? degs + 15 : ;
+        targetTail -= 15;
         tailDutyCycle = pidControlTail(targetTail, degs);// degs = targetTail;
         setPWM_Tail(tailFreq, tailDutyCycle);
-        char string[50];
-        usnprintf(string, sizeof(string), "%d %d \n\r", targetTail, degs);
-        UARTSend(string);
 
-        } else if (checkButton(RIGHT) == PUSHED) {
-            degs = -1 * (yaw * 4 + (5/2)) / 5;
-            targetTail +=15;//(2*(degs+prevYaw) + 2) / 2/ 2;//-1 * (degs - prevYaw);// <= 360)? degs + 15 : ;
-            tailDutyCycle = pidControlTail(targetTail, degs);// degs = targetTail;
-            setPWM_Tail(tailFreq, tailDutyCycle);
 
-   }
+     } else if (checkButton(RIGHT) == PUSHED) {
+        degs = -1 * (yaw * 4 + (5/2)) / 5;
+        targetTail +=15;//(2*(degs+prevYaw) + 2) / 2/ 2;//-1 * (degs - prevYaw);// <= 360)? degs + 15 : ;
+        tailDutyCycle = pidControlTail(targetTail, degs);// degs = targetTail;
+        setPWM_Tail(tailFreq, tailDutyCycle);
+     }
 }
 
 // Background task: calculate the (approximate) mean of the values in the
@@ -297,7 +304,7 @@ ADCSampling() {
     int32_t sum;
     uint8_t i = 0;
     uint16_t currentHeight = 0;
-    static uint16_t baseHeight = 0;
+   // static uint16_t baseHeight = 0;
 
     sum = 0;
     for (i = 0; i < BUF_SIZE; i++) {
@@ -356,27 +363,19 @@ main(void)
         ADCSampling();
         buttonPress();
 
-       // signed int degs = -1 * (2 * (4 * (yaw) / 5) + 1) / 2; //Convert yaw to degrees
-       // degs = -1 * (2 * (4 * (yaw) / 5) + 1) / 2;
         degs = -1 * (yaw * 4 + (5/2)) / 5;
-      //  uint32_t target = ((heightPercentage + 10) <= 10)? heightPercentage + 10 : 10;
-        //mainDutyCycle = proportionalControl(target, heightPercentage);
-       // heightPercentage = target;
-        //setPWM(mainFreq, mainDutyCycle);
 
+        tailDutyCycle = pidControlTail(targetTail, degs);//targetTail = degs;
+        setPWM_Tail(tailFreq, tailDutyCycle);
 
-//        signed int targetTail = prevYaw;//(2*(degs+prevYaw) + 2) / 2/ 2;//-1 * (degs - prevYaw);// <= 360)? degs + 15 : ;
-//        prevYaw = degs;
-       // if (degs  targetTail ) {
-            tailDutyCycle = pidControlTail(targetTail, degs);//targetTail = degs;
-             setPWM_Tail(tailFreq, tailDutyCycle);
-        //}
-        char string[50];
-        usnprintf(string, sizeof(string), "%d %d \n\r", targetTail, degs);
-        UARTSend(string);
+//        mainDutyCycle = pidControlMain(targetHeight, heightPercentage);
+//        setPWM(mainFreq, mainDutyCycle);
 
-       // displayVal(heightPercentage, degs, mainDutyCycle, mainFreq);
-       // SysCtlDelay(SysCtlClockGet() / 150); // Update display at 10 Hz
-        }
+        //char string[50];
+        //usnprintf(string, sizeof(string), "%d %d \n\r", targetTail, degs);
+        //UARTSend(string);
+        SysCtlDelay(SysCtlClockGet()/15);
+
+    }
 }
 
