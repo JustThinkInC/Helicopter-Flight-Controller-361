@@ -45,6 +45,7 @@ static uint16_t heightPercentage = 0; //Percentage of height
 
 static uint16_t currentHeight = 0;
 static uint16_t baseHeight = 0;
+bool landed = true;
 
 static uint32_t mainFreq = PWM_START_RATE_HZ;
 static uint32_t tailFreq = PWM_START_RATE_HZ;
@@ -265,17 +266,16 @@ displayVal(uint16_t meanVal, signed int degs, uint32_t mainDuty, uint32_t tailDu
 void
 buttonPress() {
     if (checkButton(UP) == PUSHED && heightPercentage < 100) {
-        if (targetHeight + 10 <= 100) {
+       if (targetHeight + 10 <= 100) {
             targetHeight += 10;
+            mainDutyCycle = pidControlMain(targetHeight, heightPercentage);
+            setPWM(mainFreq, mainDutyCycle);
         } else {
             targetHeight = 100;
+            mainDutyCycle = pidControlMain(targetHeight, heightPercentage);
+            setPWM(mainFreq, mainDutyCycle);
         }
-        mainDutyCycle = pidControlMain(targetHeight, heightPercentage);
-        setPWM(mainFreq, mainDutyCycle);
 
-        char string[50];
-        usnprintf(string, sizeof(string), "%d %d \n\r", targetHeight, heightPercentage);
-        UARTSend(string);
 
     } else if (checkButton(DOWN) == PUSHED && heightPercentage > 0) {
         //decrease height by 10%
@@ -357,19 +357,22 @@ main(void)
 
     // Enable interrupts to the processor.
     IntMasterEnable();
-
     while (1)
     {
         ADCSampling();
         buttonPress();
+
+        mainDutyCycle = pidControlMain(targetHeight, heightPercentage);
+        setPWM(mainFreq, mainDutyCycle);
 
         degs = -1 * (yaw * 4 + (5/2)) / 5;
 
         tailDutyCycle = pidControlTail(targetTail, degs);//targetTail = degs;
         setPWM_Tail(tailFreq, tailDutyCycle);
 
-//        mainDutyCycle = pidControlMain(targetHeight, heightPercentage);
-//        setPWM(mainFreq, mainDutyCycle);
+        char string[100];
+        usnprintf(string, sizeof(string), "%d %d %d \n\r", targetHeight, heightPercentage, mainDutyCycle);
+        UARTSend(string);
 
         //char string[50];
         //usnprintf(string, sizeof(string), "%d %d \n\r", targetTail, degs);

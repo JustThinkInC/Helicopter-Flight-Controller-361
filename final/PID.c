@@ -1,9 +1,9 @@
 #include "PID.h"
 
 //Variables for main
-static float kp = 0.7;
-static float ki = 0.009;
-static float kd = 0.5;
+static float kp = 1;
+static float ki = 0.0009;
+static float kd = 0.8;
 static signed int prevError = 0;
 static float error_integrated = 0;
 
@@ -14,7 +14,7 @@ static float kd_tail = 1;
 static signed int prevError_tail = 0;
 static float error_integrated_tail = 0;
 
-uint32_t pidControlMain(uint32_t target, uint32_t current){
+int pidControlMain(uint32_t target, uint32_t current){
     float error_derivative_main;
     signed int control_main;
 
@@ -23,7 +23,7 @@ uint32_t pidControlMain(uint32_t target, uint32_t current){
     error_integrated += error_main; //I
     error_derivative_main = (error_main-prevError) / 160;//D
     float dI_main = ki * error_main * 160;
-    control_main = (error_main * kp) + (kd*error_derivative_main) + (ki * error_integrated);// + ki_tail * error_integrated_tail;// + (error_integrated_tail+dI_tail);// + (error_integrated_tail * ki_tail + dI_tail) + error_derivative_tail * kd_tail;
+    control_main = 10+(error_main * kp)+(kd*error_derivative_main)+(ki*error_integrated);// + (kd*error_derivative_main) + (ki * error_integrated);// + ki_tail * error_integrated_tail;// + (error_integrated_tail+dI_tail);// + (error_integrated_tail * ki_tail + dI_tail) + error_derivative_tail * kd_tail;
 
     prevError = error_main;
 
@@ -32,7 +32,7 @@ uint32_t pidControlMain(uint32_t target, uint32_t current){
     } else if (control_main < 5) {
         control_main = 5;
     } else  {
-        error_integrated += dI_main;
+     //   error_integrated += dI_main;
     }
 
     return control_main;
