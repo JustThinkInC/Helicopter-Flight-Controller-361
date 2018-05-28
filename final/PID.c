@@ -1,8 +1,8 @@
 #include "PID.h"
 
 //Variables for main
-static float kp = 0.7;//1;
-static float ki = 2;//0.0009;
+static float kp = 0.9;//1;
+static float ki = 0.01;//0.0009;
 static float kd = 1;//0.8;
 static signed int prevError = 0;
 static float error_integrated = 0;
@@ -44,20 +44,20 @@ uint32_t pidControlMain(uint32_t target, uint32_t current) {
     uint32_t control;
 
 
-    uint32_t error = target - current;
-    error_integrated += error * (160);  //I
-    error_derivative = ((2 * (error - prevError)) + (160)) / 2 / (160); //D
+    uint32_t error = target - current; //using uint32_t seems to work better??
+    error_integrated += error * 0.00625;  //I
+    error_derivative = ((2 * (error - prevError)) + (0.00625)) / 2 / (0.00625); //D
     uint32_t dI = ki * error * 160;
-    control = error * kp ;//+ (error_integrated * ki + dI) + error_derivative * kd;
+    control = 40 + (error * kp) + (error_integrated * ki);//+ (error_integrated * ki + dI) + error_derivative * kd;
 
     prevError = error;
 
-    if (control > 80) {
-        control = 80;
+    if (control > 90) {
+        control = 90;
     } else if (control < 5) {
         control = 5;
     } else {
-        error_integrated += dI;
+        //error_integrated += dI;
     }
 
     return control;

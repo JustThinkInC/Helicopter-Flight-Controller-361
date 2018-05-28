@@ -265,8 +265,8 @@ displayVal(uint16_t meanVal, signed int degs, uint32_t mainDuty, uint32_t tailDu
 //Handle button presses
 void
 buttonPress() {
-    if (checkButton(UP) == PUSHED && heightPercentage < 100) {
-       if (targetHeight + 10 <= 100) {
+    if (checkButton(UP) == PUSHED && heightPercentage <= 100) {
+       if (heightPercentage + 10 < 100) {
             targetHeight += 10;
             mainDutyCycle = pidControlMain(targetHeight, heightPercentage);
             setPWM(mainFreq, mainDutyCycle);
