@@ -3,12 +3,12 @@
 //Variables for main
 static float kp = 0.9;//1;
 static float ki = 0.01;//0.0009;
-static float kd = 1;//0.8;
+static float kd = 0.5;//0.8;
 static signed int prevError = 0;
 static float error_integrated = 0;
 
 //Variables for tail
-static float kp_tail = 0.7;
+static float kp_tail = 0.9;
 //static float ki_tail = 1;
 static float kd_tail = 1;
 static signed int prevError_tail = 0;
@@ -40,15 +40,15 @@ static float error_integrated_tail = 0;
 
 uint32_t pidControlMain(uint32_t target, uint32_t current) {
     static uint32_t T;
-    uint32_t error_derivative;
+    float error_derivative;
     uint32_t control;
 
 
     uint32_t error = target - current; //using uint32_t seems to work better??
     error_integrated += error * 0.00625;  //I
-    error_derivative = ((2 * (error - prevError)) + (0.00625)) / 2 / (0.00625); //D
+    error_derivative = ((2 * (error - prevError)) + (160)) / 2 / (160); //D
     uint32_t dI = ki * error * 160;
-    control = 40 + (error * kp) + (error_integrated * ki);//+ (error_integrated * ki + dI) + error_derivative * kd;
+    control = (error * kp) + (error_integrated * ki) + (kd * error_derivative);//+ (error_integrated * ki + dI) + error_derivative * kd;
 
     prevError = error;
 

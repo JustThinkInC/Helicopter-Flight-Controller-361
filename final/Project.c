@@ -271,7 +271,7 @@ buttonPress() {
             mainDutyCycle = pidControlMain(targetHeight, heightPercentage);
             setPWM(mainFreq, mainDutyCycle);
         } else {
-            targetHeight = 100;
+            targetHeight = 100 - heightPercentage;
             mainDutyCycle = pidControlMain(targetHeight, heightPercentage);
             setPWM(mainFreq, mainDutyCycle);
         }
@@ -319,6 +319,25 @@ ADCSampling() {
         // Calculate helicopter altitude as a rounded percentage
         heightPercentage = ((baseHeight - currentHeight) + (14/2)) / 14;// * 4 + (7/2)) / 7;//((2 * 7 * (baseHeight - currentHeight) / 4) + 1) / 2;
         heightPercentage = (currentHeight > baseHeight) ? 0 : heightPercentage;
+    }
+}
+
+void stateMachine () {
+    switch (landed) {
+    case true:
+        //Take off
+        setPWM(mainFreq, 35);
+        landed ^= true;
+        break;
+    case false:
+        //land
+        while (heightPercentage > 0) {
+            targetHeight -= 10;
+            mainDutyCycle = pidControlMain(targetHeight, heightPercentage);
+            setPWM(mainFreq, mainDutyCycle);
+            SysCtlDelay(SysCtlClockGet()/10);
+        }
+        landed ^= true;
     }
 }
 
