@@ -453,7 +453,7 @@ main(void)
         //char string[50];
         //usnprintf(string, sizeof(string), "%d %d \n\r", targetTail, degs);
         //UARTSend(string);
-        SysCtlDelay(SysCtlClockGet()/15);
+       // SysCtlDelay(SysCtlClockGet()/15);
 
     }
 }
