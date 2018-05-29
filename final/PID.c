@@ -1,17 +1,17 @@
 #include "PID.h"
 
 //Variables for main
-static float kp = 0.7;//1;
-static float ki = 0.5;//0.0009;
-static float kd = 0.3;//0.8;
+static float kp = 0.6;//1;
+static float ki = 0.08;//0.0009;
+static float kd = 0.1;//0.8;
 static signed int prevError = 0;
 static signed int I = 0;
 static signed int prevT = 0;
 
 //Variables for tail
 static float kpTail = 0.5;
-static float kiTail = 0.005;
-static float kdTail = 0;
+static float kiTail = 0.0005;//0.0005;
+static float kdTail = 0.1;
 static signed int prevErrorTail = 0;
 static signed int prevTtail = 0;
 static float ITail = 0;
@@ -28,7 +28,7 @@ uint32_t pidControlMain(uint32_t target, uint32_t current, uint32_t ticks) {
     int32_t D = (kd / T) * (error - prevError);
     int32_t dI = ki * error * T;
 
-    control = P + (I + dI) + D + 10;//+ (error_integrated * ki + dI) + error_derivative * kd;
+    control = P + (I + dI) + D + 40;//+ (error_integrated * ki + dI) + error_derivative * kd;
 
     prevError = error;
 
@@ -76,7 +76,7 @@ int pidControlTail(signed int target, signed int current, uint32_t ticks) {
 
     int32_t control;
 
-    float T = (float)(ticks - prevTtail) / 160;
+    float T = (float)(ticks - prevTtail) / 80;//160;
     prevTtail = ticks;
 
     signed int error = target - current;
