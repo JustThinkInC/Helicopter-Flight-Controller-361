@@ -10,6 +10,6 @@
 #include <stdint.h>
 #include <uart.h>
 //int pidControlMain(uint32_t target, uint32_t current);
-uint32_t pidControlMain(uint32_t target, uint32_t current);
-int pidControlTail(signed int target, signed int current);
+uint32_t pidControlMain(uint32_t target, uint32_t current, uint32_t g_ulSampCnt);
+int pidControlTail(signed int target, signed int current, uint32_t g_ulSampCnt);
 #endif /* PID_H_ */

@@ -268,31 +268,41 @@ buttonPress() {
     if (checkButton(UP) == PUSHED && heightPercentage <= 100) {
        if (heightPercentage + 10 < 100) {
             targetHeight += 10;
-            mainDutyCycle = pidControlMain(targetHeight, heightPercentage);
+            mainDutyCycle = pidControlMain(targetHeight, heightPercentage, g_ulSampCnt);
             setPWM(mainFreq, mainDutyCycle);
         } else {
             targetHeight = 100 - heightPercentage;
-            mainDutyCycle = pidControlMain(targetHeight, heightPercentage);
+            mainDutyCycle = pidControlMain(targetHeight, heightPercentage, g_ulSampCnt);
             setPWM(mainFreq, mainDutyCycle);
         }
-
-
-    } else if (checkButton(DOWN) == PUSHED && heightPercentage > 0) {
+    } else if (checkButton(DOWN) == PUSHED && heightPercentage >= 0) {
         //decrease height by 10%
-        //mainFrequency -= (mainFrequency / 10);
+        if (heightPercentage - 10 > 0) {
+           targetHeight -= 10;
+           mainDutyCycle = pidControlMain(targetHeight, heightPercentage ,g_ulSampCnt);
+           setPWM(mainFreq, mainDutyCycle);
+        } else {
+           targetHeight = 0;//heightPercentage - 0;
+           mainDutyCycle = pidControlMain(targetHeight, heightPercentage, g_ulSampCnt);
+           setPWM(mainFreq, mainDutyCycle);
+        }
+
     } else if (checkButton(LEFT) == PUSHED) {
         //rotate 15degs ccw
         degs = -1 * (yaw * 4 + (5/2)) / 5;
         targetTail -= 15;
-        tailDutyCycle = pidControlTail(targetTail, degs);// degs = targetTail;
+        tailDutyCycle = pidControlTail(targetTail, degs, g_ulSampCnt);// degs = targetTail;
         setPWM_Tail(tailFreq, tailDutyCycle);
 
 
      } else if (checkButton(RIGHT) == PUSHED) {
         degs = -1 * (yaw * 4 + (5/2)) / 5;
         targetTail +=15;//(2*(degs+prevYaw) + 2) / 2/ 2;//-1 * (degs - prevYaw);// <= 360)? degs + 15 : ;
-        tailDutyCycle = pidControlTail(targetTail, degs);// degs = targetTail;
+        tailDutyCycle = pidControlTail(targetTail, degs, g_ulSampCnt);// degs = targetTail;
         setPWM_Tail(tailFreq, tailDutyCycle);
+
+     } else if (checkButton(SLID) == PUSHED || checkButton(SLID) == RELEASED) {
+         stateMachine();
      }
 }
 
@@ -332,11 +342,11 @@ void stateMachine () {
     case false:
         //land
         while (heightPercentage > 0) {
-            targetHeight -= 10;
-            mainDutyCycle = pidControlMain(targetHeight, heightPercentage);
+            targetHeight -= 1;
+            mainDutyCycle = pidControlMain(targetHeight, heightPercentage, g_ulSampCnt);
             setPWM(mainFreq, mainDutyCycle);
-            SysCtlDelay(SysCtlClockGet()/10);
         }
+        setPWM(mainFreq, 0);
         landed ^= true;
     }
 }
@@ -381,16 +391,16 @@ main(void)
         ADCSampling();
         buttonPress();
 
-        mainDutyCycle = pidControlMain(targetHeight, heightPercentage);
+        mainDutyCycle = pidControlMain(targetHeight, heightPercentage, g_ulSampCnt);
         setPWM(mainFreq, mainDutyCycle);
 
         degs = -1 * (yaw * 4 + (5/2)) / 5;
 
-        tailDutyCycle = pidControlTail(targetTail, degs);//targetTail = degs;
+        tailDutyCycle = pidControlTail(targetTail, degs, g_ulSampCnt);//targetTail = degs;
         setPWM_Tail(tailFreq, tailDutyCycle);
 
         char string[100];
-        usnprintf(string, sizeof(string), "%d %d %d \n\r", targetHeight, heightPercentage, mainDutyCycle);
+        usnprintf(string, sizeof(string), "%d %d %d %d \n\r", targetHeight, heightPercentage, mainDutyCycle, tailDutyCycle);
         UARTSend(string);
 
         //char string[50];
