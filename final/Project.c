@@ -25,6 +25,7 @@
 #include "PWMSetup.h"
 #include "PID.h"
 #include "uart.h"
+#include "priorityScheduler.h"
 
 //*****************************************************************************
 // Constants
@@ -417,6 +418,19 @@ void displayUART(void) {
     }
 }
 
+void stabalize(void){
+    
+    if (stabilizer) {
+            mainDutyCycle = pidControlMain(targetHeight, heightPercentage, g_ulSampCnt);
+            setPWM(mainFreq, mainDutyCycle);
+
+            degs = -1 * (yaw * 4 + (5/2)) / 5;
+
+            tailDutyCycle = pidControlTail(targetTail, degs, g_ulSampCnt);
+            setPWM_Tail(tailFreq, tailDutyCycle);
+        }
+}
+
 int
 main(void)
 {
@@ -453,28 +467,15 @@ main(void)
 
     // Enable interrupts to the processor.
     IntMasterEnable();
-    while (1)
-    {
-        ADCSampling();
-        buttonPress();
-
-        if (stabilizer) {
-            mainDutyCycle = pidControlMain(targetHeight, heightPercentage, g_ulSampCnt);
-            setPWM(mainFreq, mainDutyCycle);
-
-            degs = -1 * (yaw * 4 + (5/2)) / 5;
-
-            tailDutyCycle = pidControlTail(targetTail, degs, g_ulSampCnt);
-            setPWM_Tail(tailFreq, tailDutyCycle);
-        }
-
-        //char string[100];
-        //usnprintf(string, sizeof(string), "%d %d %d %d \n\r", targetHeight, heightPercentage, mainDutyCycle, tailDutyCycle);
-        //UARTSend(string);
-        displayUART();
-
-        SysCtlDelay(SysCtlClockGet()/20);
-
-    }
+    
+    // set up the priority schedualer 
+    
+    regesterFunction(1, ADCSampling);
+    regesterFunction(1, stabalize);
+    regesterFunction(5, buttonPress);
+    regesterFunction(10, displayUART);
+    
+    // run the regester tasks forever
+    runScheduler();
 }
 
