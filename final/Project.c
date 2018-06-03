@@ -64,21 +64,27 @@ bool isSlowTick = false;
 
 static bool foundRef = false;
 
+
+/*
+ * This is an ISR that fires when the state of the yaw referance changes, we only want to reset the degrees of the heli when we first enconter the position the camera the first time 
+ * We don't need to find this position again beyond the first time. 
+ */
 void refFound(void) {
     IntMasterDisable();
     if(GPIOPinRead(GPIO_PORTC_BASE, GPIO_PIN_4) == false && !foundRef){
         degs = 0;
+        yaw = 0;
+        targetTail *= -1;
         foundRef = true;
     }
     GPIOIntClear(GPIO_PORTC_BASE, GPIO_PIN_4);
-    yaw = 0;
-    targetTail *= -1;
+    
     IntMasterEnable();
 }
 //*****************************************************************************
 //
 // The interrupt handler for the for SysTick interrupt.
-//
+// handels some counters mostly 
 //*****************************************************************************
 void
 SysTickIntHandler(void)
@@ -102,7 +108,7 @@ SysTickIntHandler(void)
 //
 // The handler for the ADC conversion complete interrupt.
 // Writes to the circular buffer.
-//
+// 
 //*****************************************************************************
 void
 ADCIntHandler(void)
@@ -189,6 +195,9 @@ initClock(void)
     // added to config the adc with a prescaler
     SysCtlPWMClockSet(PWM_DIVIDER_CODE);
 }
+/*
+ * initADC: gets the ADC redy to convert the signal of the height sensor  
+ */
 
 void
 initADC(void)
@@ -215,7 +224,9 @@ initADC(void)
     // Enable interrupts for ADC0 sequence 3 (clears any outstanding interrupts)
     ADCIntEnable(ADC0_BASE, 3);
 }
-
+/*
+ * intRef: prepares the refernace and sets up a GPIO interupt for the heli hitting the referance position
+ */
 void
 intRef(void){
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
@@ -287,7 +298,9 @@ displayVal(uint16_t meanVal, signed int degs, uint32_t mainDuty, uint32_t tailDu
     OLEDStringDraw(tailMotorString, 0, 3);
 }
 
-//Handle button presses
+/*
+ * buttonPress: used to alter the state of serveral set points for the heli depending on button presses
+ */
 void
 buttonPress() {
     if (checkButton(UP) == PUSHED && heightPercentage < 100) {
@@ -356,7 +369,10 @@ ADCSampling() {
         heightPercentage = (heightPercentage > 100) ? 100 : heightPercentage;
     }
 }
-
+/*
+ * stateMachine: manages a statemachine depeninding on thestatic varables for the button states and if the referances is fond
+ * used to take off and land the heli
+ */
 void stateMachine() {
     switch (landed) {
     case true:
@@ -371,12 +387,6 @@ void stateMachine() {
             tailDutyCycle = pidControlTail(targetTail, degs, g_ulSampCnt);
             setPWM_Tail(tailFreq, tailDutyCycle);
             SysCtlDelay(SysCtlClockGet()/100);
-           /* tailDutyCycle = pidControlTail(targetTail, degs, g_ulSampCnt);
-            setPWM_Tail(tailFreq, tailDutyCycle);
-            SysCtlDelay(SysCtlClockGet()/100);
-            tailDutyCycle = pidControlTail(targetTail, degs, g_ulSampCnt);
-            setPWM_Tail(tailFreq, tailDutyCycle);
-            SysCtlDelay(SysCtlClockGet()/100);*/
         }
         break;
     case false:
@@ -385,15 +395,11 @@ void stateMachine() {
         while (heightPercentage > 0) {
             targetHeight = 0;//-= heightPercentage;
             targetTail *= -1;
-           // degs = -1 * (yaw * 4 + (5/2)) / 5;
-//            tailDutyCycle = pidControlTail(targetTail, degs, g_ulSampCnt);
-//            mainDutyCycle = pidControlMain(targetHeight, heightPercentage, g_ulSampCnt);
             setPWM(mainFreq, 0);
             setPWM_Tail(tailFreq, 0);
             #ifdef DEBUG_ONLY
                 UARTSend("select down press \r");
             #endif
-            //SysCtlDelay(SysCtlClockGet()/50);
 
         }stabilizer = false;
         landed = true;
@@ -401,7 +407,9 @@ void stateMachine() {
     }
 }
 
-
+/*
+ * displayUART: formats the output for dispatch of unifoed onformation to the serial output to the sharelab interface 
+ */
 void displayUART(void) {
     char string[16];
     usnprintf(string, sizeof(string), "Alt[%d] %d \r", targetHeight, heightPercentage);
@@ -418,8 +426,10 @@ void displayUART(void) {
     }
 }
 
+/*
+ * stabalize: used to get pid control updates and set them 
+ */
 void stabalize(void){
-    
     if (stabilizer) {
             mainDutyCycle = pidControlMain(targetHeight, heightPercentage, g_ulSampCnt);
             setPWM(mainFreq, mainDutyCycle);
@@ -430,7 +440,9 @@ void stabalize(void){
             setPWM_Tail(tailFreq, tailDutyCycle);
         }
 }
-
+/*
+ * initing the various periferals, and regestering the core functions for use by the sedualer, then entering the main loop
+ */
 int
 main(void)
 {
