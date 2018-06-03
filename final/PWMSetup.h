@@ -2,7 +2,9 @@
  * PWMSetup.h
  *
  *  Created on: 4/05/2018
- *      Author: ljl48
+ *      Authors: Liam Laing, George Khella, Connor Adamson
+ *  Used to configure the PWM generators using setPWM* and set using the setPWM* to alter the form of the PWM generatted
+ *  We use this set of functions to drive the two heli motors.
  */
 
 
@@ -47,12 +49,23 @@
 #define PWM_TAIL_GPIO_CONFIG GPIO_PF1_M1PWM5
 #define PWM_TAIL_GPIO_PIN    GPIO_PIN_1
 
+/* 
+ * initialisePWM is the primary configuration function that sets up the periferal pwm generator and sets it to output on GPIO J3-10 this must be called before the user can set there desired fre and duty cycle 
+ * to drive the motor
+ */
 void initialisePWM (void);
+/* setPWM is used to set the form of the pwm that is seen on J3-10 on the tiva, the user can provide a frequency (for heli flight recomended that this be at least 200hz) and a duty cycle, the latancy in
+ * motor responce means leads to partal powering instead of binary opperation 
+ */
 void setPWM (uint32_t u32Freq, uint32_t u32Duty);
 
-// added for tail pwm
-void setPWM_Tail (uint32_t ui32Freq, uint32_t ui32Duty);
+/* initialisePWM_Tail is used to configure a seperate PWM generator to drive the tail motor, this function must be called before the user can configure the use of the tail motor
+ */
 void initialisePWM_Tail(void);
-
+/*
+ * setPWM_Tail is used to alter the form of the PWM wave that is uesed to drive the motor connected to the tail rotor of the heli.
+ * it is recommended that the frequency of the pwm be at least 200hz as the motor can not turn on and off completly 200 times a second, and this will allow for non binary modes of the tail motor
+ */
+void setPWM_Tail (uint32_t ui32Freq, uint32_t ui32Duty);
 
 #endif /* PWMSETUP_H_ */

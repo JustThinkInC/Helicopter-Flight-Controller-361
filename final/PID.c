@@ -1,5 +1,10 @@
 #include "PID.h"
+/*
+ * PID.c Developed by Liam Laing, George Khella, Connor Adamson
+ * Implaments a PID system that takes in the current and desired positions and returns a duty cycle that should be set to get closer to the set point
+ */ 
 
+// We are using a set of varables that scale the change in the control signal sent to the motors
 //Variables for main
 static float kp = 0.8;
 static float ki = 0.08;
@@ -16,7 +21,12 @@ static signed int prevErrorTail = 0;
 static signed int prevTtail = 0;
 static float ITail = 0;
 
-
+// pidControlMain(
+//                    Target: this is the goal height that that we want to reach 
+//                    Current : this is the position of the heli bounded from 0 
+//                    Ticks : This is the counter that is used to maintain the current time 
+//               )
+// This is a function used to determine what duty cycle to set the main motor to 
 uint32_t pidControlMain(uint32_t target, uint32_t current, uint32_t ticks) {
     int32_t control;
 
@@ -43,7 +53,12 @@ uint32_t pidControlMain(uint32_t target, uint32_t current, uint32_t ticks) {
     return control;
 }
 
-
+// pidControlTail(
+//                    Target: this is the goal yaw that that we want to reach 
+//                    Current : this is the yaw of the heil 
+//                    Ticks : This is the counter that is used to maintain the current time 
+//               )
+// This is a function used to determine what duty cycle to set the tail motor to 
 int pidControlTail(signed int target, signed int current, uint32_t ticks) {
     int32_t control;
 

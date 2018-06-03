@@ -1,18 +1,17 @@
 // *******************************************************
 // 
-// buttons4.c
+// buttons6.c
 //
-// Support for a set of FOUR specific buttons on the Tiva/Orbit.
-// ENCE361 sample code.
-// The buttons are:  UP and DOWN (on the Orbit daughterboard) plus
+// Support for a set of SIX specific buttons on the Tiva/Orbit.
+// The buttons are:  UP and DOWN, and a SILDER (on the Orbit daughterboard) plus
 // LEFT and RIGHT on the Tiva.
+// There is also a reset button not sure is that is the final slider
 //
 // Note that pin PF0 (the pin for the RIGHT pushbutton - SW2 on
 //  the Tiva board) needs special treatment - See PhilsNotesOnTiva.rtf.
 //
-// P.J. Bones UCECE
-// Last modified:  7.2.2018
-// 
+// Authors: Liam Laing, George Khella, Connor Adamson
+// Based on Code provided by P.J. Bones UCECE 
 // *******************************************************
 
 #include <stdint.h>
@@ -23,7 +22,7 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/debug.h"
 #include "inc/tm4c123gh6pm.h"  // Board specific defines (for PF0)
-#include "buttons4.h"
+#include "buttons6.h"
 
 
 // *******************************************************

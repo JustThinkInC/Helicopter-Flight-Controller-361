@@ -2,16 +2,17 @@
 #define BUTTONS_H_
 
 // *******************************************************
-// buttons4.h
+// buttons6.h
 //
-// Support for a set of FOUR specific buttons on the Tiva/Orbit.
-// ENCE361 sample code.
-// The buttons are:  UP and DOWN (on the Orbit daughterboard) plus
+// Support for a set of SIX specific buttons on the Tiva/Orbit.
+//
+// The buttons are:  UP and DOWN, and one of the sliders  (on the Orbit daughterboard) plus
 // LEFT and RIGHT on the Tiva.
+// Also controls a another switch for reseting the board
 //
-// P.J. Bones UCECE
-// Last modified:  7.2.2018
+// Authors: Liam Laing, George Khella, Connor Adamson
 // 
+// Based on code provided by P.J. Bones UCECE
 // *******************************************************
 
 #include <stdint.h>
@@ -42,12 +43,12 @@ enum butStates {RELEASED = 0, PUSHED, NO_CHANGE};
 #define RIGHT_BUT_PORT_BASE  GPIO_PORTF_BASE
 #define RIGHT_BUT_PIN  GPIO_PIN_0
 #define RIGHT_BUT_NORMAL  true
-//Slider
+// Slider
 #define SLID_BUT_PERIPH  SYSCTL_PERIPH_GPIOA
 #define SLID_BUT_PORT_BASE  GPIO_PORTA_BASE
 #define SLID_BUT_PIN  GPIO_PIN_7
 #define SLID_BUT_NORMAL   false
-
+// Reset pin 
 #define SLID2_BUT_PERIPH  SYSCTL_PERIPH_GPIOA
 #define SLID2_BUT_PORT_BASE  GPIO_PORTA_BASE
 #define SLID2_BUT_PIN  GPIO_PIN_6

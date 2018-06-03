@@ -9,11 +9,13 @@
 #include "driverlib/gpio.h"
 #include "driverlib/pwm.h"
 #include "driverlib/sysctl.h"
-
+/* PWMSetup.c Authors: Liam Laing, George Khella, Connor Adamson
+ * This is used to initalize and use the PWM generators that are configured to use the drive the main and tail motor 
 
 /*********************************************************
  * initialisePWM
  * M0PWM7 (J4-05, PC5) is used for the main rotor motor
+ * Enables the spesific perfieral for the pwm and configure it ti link to the GPIO pin
  *********************************************************/
 void
 initialisePWM (void)
@@ -35,6 +37,10 @@ initialisePWM (void)
     PWMOutputState(PWM_MAIN_BASE, PWM_MAIN_OUTBIT, false);
 }
 
+/*
+ * This is used to initalize the pmw generator and link it to the GPIO pin J1-04 
+ * it is then disengaged and mst be turned on when the user atually wants to use it.
+ */
 void
 initialisePWM_Tail(void){
     SysCtlPeripheralEnable(PWM_TAIL_PERIPH_PWM);
@@ -45,8 +51,6 @@ initialisePWM_Tail(void){
 
     PWMGenConfigure(PWM_TAIL_BASE, PWM_TAIL_GEN,
                     PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
-    // Set the initial PWM parameters
-   // setPWM_Tail (PWM_START_RATE_HZ, PWM_FIXED_DUTY);
 
     PWMGenEnable(PWM_TAIL_BASE, PWM_TAIL_GEN);
 
@@ -56,7 +60,8 @@ initialisePWM_Tail(void){
 }
 
 /********************************************************
- * Function to set the freq, duty cycle of M0PWM7
+ * Function to set the freq, duty cycle of M0PWM7 we leave it posible to alter the frequency of the pwm but in this instance the we want to provide an interface to set the 
+ * current duty cycle to drive the main motor of the heli
  ********************************************************/
 void
 setPWM (uint32_t ui32Freq, uint32_t ui32Duty)
@@ -69,6 +74,11 @@ setPWM (uint32_t ui32Freq, uint32_t ui32Duty)
     PWMPulseWidthSet(PWM_MAIN_BASE, PWM_MAIN_OUTNUM,
         ui32Period * ui32Duty / 100);
 }
+
+/*
+ * setPWM_Tail: is used to set the duty cycle of the the tail motor. this function is a dependancy of the PID system as a means achive the desired lateral directional move 
+ * despite the tork imposed by the main rotors opperation
+ */
 
 void
 setPWM_Tail (uint32_t ui32Freq, uint32_t ui32Duty)

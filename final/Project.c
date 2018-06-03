@@ -19,7 +19,7 @@
 #include "utils/ustdlib.h"
 #include "circBufT.h"
 #include "OrbitOLED/OrbitOLEDInterface.h"
-#include "buttons4.h"
+#include "buttons6.h"
 
 // Moduals developed by group
 #include "PWMSetup.h"
