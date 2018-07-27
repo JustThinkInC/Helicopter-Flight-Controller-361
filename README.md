@@ -14,9 +14,11 @@ Helicopter control was carried out through a web interface.
 * buttons6.c: Buttons module with debouncing implemented.
 
 ## Contributors
-Liam Laing
+Liam Laing: https://github.com/liamlaing
+
 Connor Adamson
-Dr Phil Bones (Original Author for some modules)
+
+Dr Phil Bones (Original author for some modules)
 
 ## License
 Usage of this code (whether partial or full) is NOT permitted*. However, you may examine the code for your own private study.
