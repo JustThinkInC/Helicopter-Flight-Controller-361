@@ -1,4 +1,4 @@
-// Milestone2.c - Reliable Yaw Monitoring & Altitude Monitoring
+// Functional flight controller for helicopter rig.
 //
 // Authors:  George Khella, Liam Laing, Connor Adamson
 // Original Author: P. J. Bones
@@ -21,7 +21,7 @@
 #include "OrbitOLED/OrbitOLEDInterface.h"
 #include "buttons6.h"
 
-// Moduals developed by group
+// Modules developed by group
 #include "PWMSetup.h"
 #include "PID.h"
 #include "uart.h"
@@ -66,7 +66,8 @@ static bool foundRef = false;
 
 
 /*
- * This is an ISR that fires when the state of the yaw referance changes, we only want to reset the degrees of the heli when we first enconter the position the camera the first time 
+ * This is an ISR that fires when the state of the yaw referance changes.
+ * We only want to reset the degrees of the heli when we first encounter the initial position of the camera.
  * We don't need to find this position again beyond the first time. 
  */
 void refFound(void) {
@@ -81,6 +82,7 @@ void refFound(void) {
     
     IntMasterEnable();
 }
+
 //*****************************************************************************
 //
 // The interrupt handler for the for SysTick interrupt.
@@ -195,10 +197,10 @@ initClock(void)
     // added to config the adc with a prescaler
     SysCtlPWMClockSet(PWM_DIVIDER_CODE);
 }
+
 /*
  * initADC: gets the ADC redy to convert the signal of the height sensor  
  */
-
 void
 initADC(void)
 {
@@ -224,6 +226,7 @@ initADC(void)
     // Enable interrupts for ADC0 sequence 3 (clears any outstanding interrupts)
     ADCIntEnable(ADC0_BASE, 3);
 }
+
 /*
  * intRef: prepares the refernace and sets up a GPIO interupt for the heli hitting the referance position
  */
@@ -299,7 +302,7 @@ displayVal(uint16_t meanVal, signed int degs, uint32_t mainDuty, uint32_t tailDu
 }
 
 /*
- * buttonPress: used to alter the state of serveral set points for the heli depending on button presses
+ * buttonPress: used to alter the state of several set points for the heli depending on button presses
  */
 void
 buttonPress() {
@@ -346,7 +349,6 @@ buttonPress() {
 
 // Background task: calculate the (approximate) mean of the values in the
 // circular buffer and display it, together with the sample number.
-
 void
 ADCSampling() {
     int32_t sum;
@@ -369,9 +371,11 @@ ADCSampling() {
         heightPercentage = (heightPercentage > 100) ? 100 : heightPercentage;
     }
 }
+
 /*
- * stateMachine: manages a statemachine depeninding on thestatic varables for the button states and if the referances is fond
- * used to take off and land the heli
+ * StateMachine: manages a statemachine depending on the static variables
+ * for the button states and if the references are found.
+ * Used to take off and land the heli
  */
 void stateMachine() {
     switch (landed) {
@@ -393,7 +397,7 @@ void stateMachine() {
         //land
         UARTSend("Mode: Landing \r");
         while (heightPercentage > 0) {
-            targetHeight = 0;//-= heightPercentage;
+            targetHeight = 0;
             targetTail *= -1;
             setPWM(mainFreq, 0);
             setPWM_Tail(tailFreq, 0);
@@ -408,7 +412,7 @@ void stateMachine() {
 }
 
 /*
- * displayUART: formats the output for dispatch of unifoed onformation to the serial output to the sharelab interface 
+ * displayUART: formats the output for dispatch of unified information to the serial output to the sharelab interface 
  */
 void displayUART(void) {
     char string[16];
@@ -441,7 +445,9 @@ void stabalize(void){
         }
 }
 /*
- * initing the various periferals, and regestering the core functions for use by the sedualer, then entering the main loop
+ * Initialising the various peripherals, 
+ * registering the core functions for use by the scheduler,
+ * then entering the main loop
  */
 int
 main(void)
@@ -480,14 +486,14 @@ main(void)
     // Enable interrupts to the processor.
     IntMasterEnable();
     
-    // set up the priority schedualer 
+    // set up the priority scheduler 
     
-    regesterFunction(1, ADCSampling);
-    regesterFunction(1, stabalize);
-    regesterFunction(5, buttonPress);
-    regesterFunction(10, displayUART);
+    registerFunction(1, ADCSampling);
+    registerFunction(1, stabalize);
+    registerFunction(5, buttonPress);
+    registerFunction(10, displayUART);
     
-    // run the regester tasks forever
+    // run the registered tasks forever
     runScheduler();
 }
 

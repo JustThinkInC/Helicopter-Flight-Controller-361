@@ -3,9 +3,12 @@
  *
  *  Created on: 26/05/2018
  *      Authors: Liam Laing, George Khella, Connor Adamson
- *  The tiva comes with uart modual. We can use this to display the information about the internal state of the heli to the user. Given the profound usefulness of this we have developed a modual that initalizes the uart,
+ *  The Tiva comes with a UART module. We can use this to display the information 
+ *  about the internal state of the heli to the user. 
+ *  Given the profound usefulness of this we have developed a module that initializes the UART,
  *  then the user can send strings to the terminal using UARTSend(char*)
- * It is important to note that there are limits on how long this string may be, faluure to conform to this will invoke undefined behaviour
+ * It is important to note that there are limits on how long this string may be,
+ * failure to conform to this will invoke undefined behaviour.
  * This code was based on a demo program provided to the ENCE361 2018 class
  */
 
@@ -42,11 +45,14 @@
 #define UART_USB_GPIO_PINS      UART_USB_GPIO_PIN_RX | UART_USB_GPIO_PIN_TX
 
 
-/* enables and configures the uart for transmission, this includes packet format and BAUD_RATE 
+/* Enables and configures the uart for transmission.
+ * This includes packet format and BAUD_RATE 
  */
 void initialiseUSB_UART (void);
+
 /*
- * takes the str provided by the user and writes it to the uarts buffer for transmission at will, not that the uart must be inited before this can be meaningfuly invoked.
+ * Takes the string provided by the user and writes it to the UART buffer for transmission at will
+ * Note: that the uart must be iniated before this can be meaningfuly invoked.
  */
 void UARTSend (char *pucBuffer);
 

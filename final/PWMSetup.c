@@ -1,3 +1,7 @@
+/* PWMSetup.c Authors: Liam Laing, George Khella, Connor Adamson
+* This is used to initalize and use the PWM generators that are configured to use the drive the main and tail motor
+*/
+
 # include "PWMSetup.h"
 
 #include <stdint.h>
@@ -9,8 +13,6 @@
 #include "driverlib/gpio.h"
 #include "driverlib/pwm.h"
 #include "driverlib/sysctl.h"
-/* PWMSetup.c Authors: Liam Laing, George Khella, Connor Adamson
- * This is used to initalize and use the PWM generators that are configured to use the drive the main and tail motor 
 
 /*********************************************************
  * initialisePWM
@@ -28,8 +30,6 @@ initialisePWM (void)
 
     PWMGenConfigure(PWM_MAIN_BASE, PWM_MAIN_GEN,
                     PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
-    // Set the initial PWM parameters
-    //setPWM (PWM_START_RATE_HZ, PWM_FIXED_DUTY);
 
     PWMGenEnable(PWM_MAIN_BASE, PWM_MAIN_GEN);
 
@@ -39,7 +39,7 @@ initialisePWM (void)
 
 /*
  * This is used to initalize the pmw generator and link it to the GPIO pin J1-04 
- * it is then disengaged and mst be turned on when the user atually wants to use it.
+ * it is then disengaged and must be turned on when the user wants to use it.
  */
 void
 initialisePWM_Tail(void){
@@ -54,14 +54,16 @@ initialisePWM_Tail(void){
 
     PWMGenEnable(PWM_TAIL_BASE, PWM_TAIL_GEN);
 
-    // Disable the output.  Repeat this call with 'true' to turn O/P on.
+    // Disable the output. Repeat this call with 'true' to turn O/P on.
     PWMOutputState(PWM_TAIL_BASE, PWM_TAIL_OUTBIT, false);
 
 }
 
 /********************************************************
- * Function to set the freq, duty cycle of M0PWM7 we leave it posible to alter the frequency of the pwm but in this instance the we want to provide an interface to set the 
- * current duty cycle to drive the main motor of the heli
+ * Function to set the freq, duty cycle of M0PWM7
+ * Possible to alter the frequency of pwm but we want to 
+ * provide an interface to set the current duty cycle to
+ * drive the main motor of the heli
  ********************************************************/
 void
 setPWM (uint32_t ui32Freq, uint32_t ui32Duty)
@@ -76,10 +78,11 @@ setPWM (uint32_t ui32Freq, uint32_t ui32Duty)
 }
 
 /*
- * setPWM_Tail: is used to set the duty cycle of the the tail motor. this function is a dependancy of the PID system as a means achive the desired lateral directional move 
- * despite the tork imposed by the main rotors opperation
+ * setPWM_Tail: is used to set the duty cycle of the the tail motor. 
+ * This function is a dependency of the PID system as a means to 
+ * achieve the desired lateral directional move 
+ * despite the torque imposed by the main rotor's operation
  */
-
 void
 setPWM_Tail (uint32_t ui32Freq, uint32_t ui32Duty)
 {
