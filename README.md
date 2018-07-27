@@ -13,6 +13,11 @@ Helicopter control was carried out through a web interface.
 * circBufT.c: Circular buffer module, used for storing ADC values for the height.
 * buttons6.c: Buttons module with debouncing implemented.
 
+## Contributors
+Liam Laing
+Connor Adamson
+Dr Phil Bones (Original Author for some modules)
+
 ## License
 Usage of this code (whether partial or full) is NOT permitted*. However, you may examine the code for your own private study.
 
